@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>101 Yommarat Minimarathon 2027 - Lucky Draw Stage</title>
+  
+  <!-- Google Fonts: Prompt & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Canvas Confetti Library CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Firebase Realtime Database SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --brand-navy: #0e1e40;
+      --brand-blue: #1a56db;
+      --brand-cyan: #00b4d8;
+      --brand-pink: #f43f5e;
+      --brand-magenta: #e11d48;
+    }
+
+    body {
+      font-family: 'Prompt', 'Kanit', sans-serif;
+      background-color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(26, 86, 219, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.06) 0px, transparent 45%),
+        radial-gradient(at 50% 100%, rgba(2, 132, 199, 0.07) 0px, transparent 50%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-sport {
+      font-family: 'Kanit', sans-serif;
+    }
+
+    .clean-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+
+    .stage-card-arena {
+      background: radial-gradient(130% 120% at 50% 10%, #172554 0%, #0c152e 100%);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 25px 50px -12px rgba(15, 23, 42, 0.35),
+        0 0 40px -10px rgba(26, 86, 219, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .stage-card-arena.rolling {
+      border-color: #38bdf8;
+      box-shadow: 
+        0 0 60px rgba(56, 189, 248, 0.4),
+        0 0 80px rgba(244, 63, 94, 0.25),
+        inset 0 0 20px rgba(56, 189, 248, 0.3);
+      animation: pulseStage 0.6s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseStage {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.006); }
+    }
+
+    .winner-revealed {
+      animation: winnerPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes winnerPop {
+      0% { transform: scale(0.7); opacity: 0; filter: blur(8px); }
+      70% { transform: scale(1.08); opacity: 1; filter: blur(0); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .text-title-gradient {
+      background: linear-gradient(135deg, #0f2b66 0%, #1e40af 55%, #e11d48 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-winner-gold {
+      background: linear-gradient(135deg, #FFFDF0 0%, #FDE047 35%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="text-slate-800 flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+
+  <!-- ================= TOP HEADER (WHITE CLEAN MINIMAL) ================= -->
+  <header class="w-full bg-white border-b border-slate-200/90 shadow-sm sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center gap-3.5">
+        <div class="relative w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center p-1 overflow-hidden shrink-0 group">
+          <img src="101.jpg" alt="101 Yommarat Marathon Logo" 
+               class="w-full h-full object-contain"
+               onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
+          <div id="fallbackLogo" class="hidden w-full h-full items-center justify-center bg-gradient-to-br from-blue-700 to-rose-600 rounded-xl text-white font-extrabold text-sm tracking-tighter">
+            101
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] tracking-wider font-bold uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              Live Stage System
+            </span>
+            <span id="syncIndicator" class="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> เชื่อมต่อ Real-time
+            </span>
+          </div>
+          <h1 class="text-lg sm:text-xl md:text-2xl font-black tracking-tight font-sport uppercase text-title-gradient">
+            101 YOMMARAT MINIMARATHON 2027
+          </h1>
+        </div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+        <button onclick="openModal('prizesModal')" class="px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 transition-all flex items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4m-14 0v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+          <span>ของรางวัล</span>
+          <span id="prizesBadgeCount" class="ml-1 px-1.5 py-0.5 rounded-full bg-blue-600 text-white font-bold text-[10px]">1</span>
+        </button>
+
+        <button onclick="openModal('participantsModal')" class="px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition-all flex items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span>ผู้เข้าร่วม (<span id="btnParticipantCount">0</span>)</span>
+        </button>
+
+        <div class="h-6 w-px bg-slate-200 hidden sm:block mx-1"></div>
+
+        <button onclick="toggleAudio()" id="btnAudioMute" class="p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all" title="เปิด/ปิดเสียง">
+          <svg id="iconVolumeOn" class="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+          <svg id="iconVolumeOff" class="w-4 h-4 hidden text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+        </button>
+
+        <button onclick="toggleFullscreen()" class="p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all" title="เต็มจอ (Fullscreen)">
+          <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 flex flex-col justify-center">
+    
+    <!-- Top Stats Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto w-full mb-6 text-center">
+      <div class="clean-card p-3 rounded-2xl border-t-2 border-t-blue-500">
+        <span class="text-xs text-slate-500 font-medium block">ในโถสุ่มปัจจุบัน</span>
+        <span id="statRemaining" class="text-xl sm:text-2xl font-black font-sport text-blue-700">0</span>
+        <span class="text-[10px] text-slate-400 font-bold uppercase">คน</span>
+      </div>
+      <div class="clean-card p-3 rounded-2xl border-t-2 border-t-rose-500">
+        <span class="text-xs text-slate-500 font-medium block">มอบรางวัลแล้ว</span>
+        <span id="statDrawn" class="text-xl sm:text-2xl font-black font-sport text-rose-600">0</span>
+        <span class="text-[10px] text-slate-400 font-bold uppercase">คน</span>
+      </div>
+      <div class="clean-card p-3 rounded-2xl border-t-2 border-t-indigo-500">
+        <span class="text-xs text-slate-500 font-medium block">รายชื่อทั้งหมด</span>
+        <span id="statTotal" class="text-xl sm:text-2xl font-black font-sport text-slate-700">0</span>
+        <span class="text-[10px] text-slate-400 font-bold uppercase">คน</span>
+      </div>
+      <div class="clean-card p-3 rounded-2xl border-t-2 border-t-amber-500">
+        <span class="text-xs text-slate-500 font-medium block">รางวัลคงเหลือ</span>
+        <span id="statRemainingPrizes" class="text-xl sm:text-2xl font-black font-sport text-amber-600">0</span>
+        <span class="text-[10px] text-slate-400 font-bold uppercase">รายการ</span>
+      </div>
+    </div>
+
+    <!-- MAIN DISPLAY STAGE -->
+    <div class="relative w-full max-w-5xl mx-auto mb-6">
+      <div class="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-rose-500/20 to-sky-400/20 rounded-[2.5rem] blur-xl opacity-80 pointer-events-none"></div>
+
+      <div id="mainStageCard" class="relative stage-card-arena rounded-[2.2rem] p-6 sm:p-10 md:p-12 text-center transition-all duration-300 overflow-hidden flex flex-col justify-center min-h-[380px] md:min-h-[430px]">
+        
+        <div class="absolute inset-0 opacity-15 pointer-events-none">
+          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 800 400">
+            <path d="M-100,200 C200,60 400,340 900,120" stroke="#38bdf8" stroke-width="4" fill="none"/>
+            <path d="M-100,240 C250,110 450,390 900,160" stroke="#f43f5e" stroke-width="4" fill="none"/>
+          </svg>
+        </div>
+
+        <div class="relative z-10 mb-4 inline-flex items-center justify-center self-center">
+          <div class="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-slate-900/80 border border-sky-400/40 shadow-lg shadow-sky-500/10">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-300 font-light">กำลังจับรางวัลสำหรับ:</span>
+            <span id="currentPrizeText" class="text-base sm:text-xl font-bold text-amber-300 tracking-wide font-sport">รางวัลที่ 1</span>
+          </div>
+        </div>
+
+        <div class="relative z-10 py-6 md:py-10 my-auto flex flex-col items-center justify-center">
+          <div id="winnerContainer" class="w-full">
+            <p id="stageSubtext" class="text-xs sm:text-sm tracking-[0.25em] uppercase text-sky-300/80 font-bold mb-3">
+              READY FOR DRAW
+            </p>
+            <h2 id="stageDisplayName" class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight font-sport text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] px-2 transition-all">
+              กดปุ่มเพื่อเริ่มสุ่ม
+            </h2>
+          </div>
+        </div>
+
+        <div id="stageStatusFooter" class="relative z-10 pt-2 text-xs sm:text-sm text-slate-400 font-light flex items-center justify-center gap-2">
+          <span>กดแป้นพิมพ์ <kbd class="px-2 py-0.5 rounded bg-slate-800 text-sky-300 font-mono border border-slate-700">Spacebar</kbd> เพื่อเริ่มหรือหยุด</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row items-center justify-center gap-4">
+      
+      <div class="bg-white px-2 py-1.5 rounded-2xl flex items-center gap-1 border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 px-2 hidden sm:inline">เวลาสุ่ม:</span>
+        <button type="button" onclick="setDuration(5, this)" class="duration-btn px-3 py-1.5 text-xs sm:text-sm rounded-xl font-medium transition-all text-slate-600 hover:text-blue-600">
+          5 วิ
+        </button>
+        <button type="button" onclick="setDuration(8, this)" class="duration-btn px-3.5 py-1.5 text-xs sm:text-sm rounded-xl font-bold transition-all bg-blue-600 text-white shadow-md shadow-blue-500/25">
+          8 วิ
+        </button>
+        <button type="button" onclick="setDuration(10, this)" class="duration-btn px-3 py-1.5 text-xs sm:text-sm rounded-xl font-medium transition-all text-slate-600 hover:text-blue-600">
+          10 วิ
+        </button>
+        <button type="button" onclick="setDuration(0, this)" class="duration-btn px-3 py-1.5 text-xs sm:text-sm rounded-xl font-bold transition-all text-rose-600 hover:bg-rose-50">
+          ทันที⚡
+        </button>
+      </div>
+
+      <button id="btnStartDraw" onclick="handleDrawClick()" class="group relative px-9 py-3.5 rounded-2xl font-black text-lg sm:text-xl tracking-wider font-sport uppercase overflow-hidden shadow-xl shadow-blue-600/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-700 via-blue-600 to-rose-600 transition-all duration-300 group-hover:opacity-95"></div>
+        <div class="absolute -inset-1 bg-gradient-to-r from-sky-400 to-rose-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
+        <span class="relative z-10 flex items-center justify-center gap-3 text-white">
+          <svg class="w-6 h-6 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span id="btnStartDrawText">เริ่มสุ่มรางวัล</span>
+        </span>
+      </button>
+
+    </div>
+
+    <!-- Winners Table -->
+    <section class="max-w-5xl mx-auto w-full mt-10">
+      <div class="clean-card rounded-2xl p-5 md:p-6 border border-slate-200">
+        
+        <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b border-slate-100 gap-3">
+          <div class="flex items-center gap-3">
+            <span class="p-2 rounded-xl bg-blue-50 border border-blue-100 text-blue-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </span>
+            <div>
+              <h3 class="text-base sm:text-lg font-black font-sport tracking-wide text-slate-800">ทำเนียบรายชื่อผู้ได้รับรางวัล (Live Winners)</h3>
+              <p class="text-xs text-slate-500 font-light">ประวัติผลการจับรางวัลตามลำดับเวลา</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="exportHistoryCSV()" class="px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 text-emerald-700 border border-emerald-300 transition-all flex items-center gap-1.5 shadow-sm">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>ส่งออก Excel/CSV</span>
+            </button>
+            <button onclick="confirmResetSystem()" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition-all flex items-center gap-1">
+              <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              <span>รีเซ็ต</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto rounded-xl border border-slate-100">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase bg-slate-50 text-slate-600 font-bold sticky top-0 border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-4">ลำดับ</th>
+                <th class="py-2.5 px-4">ชื่อรางวัล</th>
+                <th class="py-2.5 px-4">ชื่อผู้โชคดี (นักวิ่ง)</th>
+                <th class="py-2.5 px-4 text-right">เวลาที่ได้รับ</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 bg-white text-slate-700">
+              <tr id="emptyHistoryRow">
+                <td colspan="4" class="text-center py-8 text-slate-400 text-sm">
+                  ยังไม่มีผู้ได้รับรางวัลในรอบนี้ เริ่มสุ่มผู้โชคดีคนแรกกันเลย!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="w-full py-4 text-center text-xs text-slate-500 border-t border-slate-200 bg-white mt-10">
+    101 YOMMARAT MINIMARATHON 2027 &bull; Real-time Multi-Device Sync Stage
+  </footer>
+
+  <!-- ================= MODALS ================= -->
+  <div id="prizesModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="clean-card w-full max-w-lg rounded-3xl p-6 border border-slate-200 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-black font-sport text-blue-800 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4m-14 0v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+          กำหนดรายการของรางวัล
+        </h3>
+        <button onclick="closeModal('prizesModal')" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">✕</button>
+      </div>
+
+      <div class="my-4">
+        <p class="text-xs text-slate-600 mb-2 font-medium">
+          พิมพ์หรือวางรายการของรางวัล (1 บรรทัดต่อ 1 รางวัล) ระบบจะแจกตามลำดับจากบนลงล่าง:
+        </p>
+        <textarea id="prizesTextarea" rows="8" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-800 focus:outline-none focus:border-blue-500 font-sans focus:bg-white transition-all" placeholder="ทองคำแท่ง 1 บาท&#10;Smart Watch Garmin Forerunner&#10;รองเท้าวิ่ง Nike Vaporfly&#10;บัตรกำนัล 2,000 บาท"></textarea>
+        <p class="text-[11px] text-slate-400 mt-1.5">
+          * หากเว้นว่างไว้ ระบบจะตั้งค่าเป็น "รางวัลที่ 1", "รางวัลที่ 2", "รางวัลที่ 3"... ให้อัตโนมัติ
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeModal('prizesModal')" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">ยกเลิก</button>
+        <button onclick="savePrizesList()" class="px-5 py-2 text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20">บันทึกของรางวัล</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="participantsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="clean-card w-full max-w-2xl rounded-3xl p-6 border border-slate-200 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-black font-sport text-rose-600 flex items-center gap-2">
+          <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          จัดการรายชื่อนักวิ่งผู้เข้าร่วม
+        </h3>
+        <button onclick="closeModal('participantsModal')" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">✕</button>
+      </div>
+
+      <div class="my-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs text-slate-600 font-medium">
+            รายชื่อผู้มีสิทธิ์ลุ้นรางวัลทั้งหมด (1 บรรทัดต่อ 1 ท่าน):
+          </p>
+          <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+            ตรวจพบ <span id="modalParticipantCount">0</span> ท่าน
+          </span>
+        </div>
+        <textarea id="participantsTextarea" rows="12" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-rose-500 font-sans focus:bg-white transition-all" placeholder="กรอกหรือวางรายชื่อนักวิ่งที่นี่..."></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+        <button onclick="restoreDefaultRunners()" class="px-3 py-1.5 text-xs font-semibold text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all border border-amber-200">
+          โหลดรายชื่อเริ่มต้น (วิ่ง 2027)
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeModal('participantsModal')" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">ยกเลิก</button>
+          <button onclick="saveParticipantsList()" class="px-5 py-2 text-sm font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/20">บันทึกรายชื่อ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Generator -->
+  <script>
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playShuffleTick(pitchMultiplier = 1) {
+      if (isSoundMuted) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        const baseFreq = 480 + Math.random() * 120;
+        osc.frequency.setValueAtTime(baseFreq * pitchMultiplier, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.05);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    function playFanfareChords() {
+      if (isSoundMuted) return;
+      try {
+        initAudio();
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        const now = audioCtx.currentTime;
+
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+
+          gain.gain.setValueAtTime(0, now + idx * 0.07);
+          gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.07 + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.07 + 1.2);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + idx * 0.07);
+          osc.stop(now + idx * 0.07 + 1.3);
+        });
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      isSoundMuted = !isSoundMuted;
+      document.getElementById('iconVolumeOn').classList.toggle('hidden', isSoundMuted);
+      document.getElementById('iconVolumeOff').classList.toggle('hidden', !isSoundMuted);
+    }
+  </script>
+
+  <!-- Complete Runner List -->
+  <script>
+    const DEFAULT_PARTICIPANTS = [
+      "วัชรพงษ์ อนันต์วรปัญญา", "Jessada Piampreecha", "กัญฐณา แก้วแดง", "อรอนงค์ ศรีมงคล",
+      "กัลยรัตน์ ผลิเจริญสุข", "วรรณพร เฑียรทอง", "ปฏิภาณ สกุณี", "บงกช พันธุ์มาดี",
+      "ณัฐพงศ์ คงมีชนม์", "ธีมาพร งามวิเศษ", "ธีรภัทร คงมีชนม์", "ธัญลักษณ์ วงษ์หมี",
+      "พิกุล ยินเยื้อน", "ทยากร วิชัยรัมย์", "ฐานิตา ชนิตรานันท์", "อนุชา ประเสริฐ",
+      "อารีย์ ปรึกษา", "Sakun Wiriyapat", "วรรณา คงศิริ", "Panupong Somjit",
+      "ชมภู สูงปานเขา", "มนชยา คำเกลี้ยง", "Pitchaya Suwannasoon", "ดร.ธีระยุทร เมกประสาท",
+      "ธัญณิชา เข็มขาว", "วัลลภา พานิช", "ปุญญภัทร นรากรมังคลา", "สุภัสสร ถีระแก้ว",
+      "สอน พรหมพันธ์", "ทรงฤทธิ์ พรหมพันธ์", "Nakharin Thongsamrit", "มินท์ธิตา อ่อนดำ",
+      "สิริโชค แสงมณี", "ชาญฤดี สุทธิหิรัญ", "ปิยะพงศ์ ทองฤทธิ์", "กัลยา สกุลมีฤทธิ์",
+      "วศพล สกุลมีฤทธิ์", "Anongnart Sangin", "วุฒิชัย อำภา", "Weeraphat Chotiyaputta",
+      "ศุภรัตน์ ศรีทองเกิด", "นพรุจ หาญมุ่งธรรม", "Krongkan Piemkla", "Chainarong paisan",
+      "ทิฐินันท์ ทิฐิภพโภคิน", "Kwanruethai Lamultree", "ฐิตญาบุตฏ์ ทองบุญพัฒน์", "บุญส่ง เกล็ดจีน",
+      "พัชรพล ทองคำ", "จิรพร ดาหนองโดก", "นายชลอ บัวนวล", "Adisak Krangpanich",
+      "ชีวารัตน์ ซ่อนกลิ่น", "ภัทรา วีระบุตร", "ภัทราภรณ์ บุญม่วง", "ภัทราวดี ทิพยดี",
+      "คมกฤช เกตุปลั่ง", "พงศ์ศิริ น้ำเงิน", "อนุวัตร สมพงษ์", "สุภารัตน์ ป้อมปลั่ง",
+      "ชนิดา แสวงคำ", "หฤทัย กลิ่นเพชร", "ณัฐอรณ์ จุลเวช", "วัชระ กลิ่นสุวรรณ",
+      "ปิยะพร แซ่เฮ้ง", "ธนวัฒน์ วังกรานต์", "สมพิศ เล็กถวิลวงศ์", "ณัฐนรี สุนทรวิภาต",
+      "ปุภิพรชัย หริ่งรอด", "เจนจิรา รอดนุช", "ณิชากร จันทร", "มนตรี เปี่ยมคล้า",
+      "ITTI JUMREANG", "นารีรัตน์ แย้มมานัส", "ธนชนนี โลหิตคุปต์", "อารียา บัวชุม",
+      "อาทิตย์ ศรีธรรมกิจจา", "รักษิต ปรกอบวิทย์", "ชุติเดช สกุณี", "จิราภรณ์ แก้วปาน",
+      "เชษฐา บุญสุยา", "วีรพล คงควร", "อุมารินทร์ จันทา", "Anon LEKPRIROM",
+      "มณทล นุริตะมนต์", "Sopitta Dakabut", "น.ส.อามีณา ใจอารีย์", "วชิรวิชญ์ รัตนเศรษฐ์",
+      "พีรวิชญ บัวหอม", "ชิษณุชา จำปาเงิน", "อาภัสรา บุตรศรีขาว", "สุตาภัทร เจริญธรรมรักษา",
+      "กฤติน พุ่มวงษ์", "ศิริรัตน์ ยอดยิ่ง", "สุนันทา พลายระหาร", "พิชญุตม์ จำปาเงิน",
+      "เสาวลักษณ์ อินทองน้อย", "ธีรเทพ มะนาวหวาน", "ธมลวรรณ ปิ่นวิเศษ", "จิตติมา เอกตระกูลชัย",
+      "ศิริมา สาระสุวรรณ์", "วิชญาพร ดวงตาแก้ว", "ยุทธพร ทองศรี", "Kanlaya Sankaw",
+      "ดำเนิน นิ่มนวล", "สายสมร เกียรติกุล", "ภคพร ชินวรรณ", "วรทัศน์ ลาวัง",
+      "กมลชนก นิโลบล", "Pariyakorn Chokkittiwarakoon", "วีณา สอนทอง", "ธิติพงษ์ มงคลชาญ",
+      "วลัยภรณ์ แสงสุวรรณ", "วชิรญา สันธนพิพัฒน์", "kanokwan sangjan", "อภิชัย เข็มทอง",
+      "Taweesit Silprakob", "สุกฤษฏิ์ กลั่นบุศย์", "รักษิณา ศรีประจันทร์", "กรวรรณ โชระเวก",
+      "ทวีคูณ ดูเรืองรัมย์", "อรุณี สิมลี่", "ปัญษภัทร ฐิติอังกูล", "อรทัย จันทร",
+      "สุภาวดีย์ สุวรรณหงษ์", "จำเนียร จีนสุกแสง", "กรองแก้ว สุนทรนนท์", "อนวัช ศุภศร",
+      "อัจฉราพร กลิ่นเกษร", "Sittipod Chinda-in", "Kanokporn Talek", "วัชรพงษ์ หงษ์เวียงจันทร์",
+      "watcharachai tongleaw", "ศุภกร หงษ์เวียงจันทร์", "พัชรินทร์ โชติช่วงนภา", "ภูวพัชญ์ มีชะนะ",
+      "Jirapong Suksawang", "Nuttapong Sribanjong", "Pathompong Kumdee", "พงศ์เพชร เตชะวงศ์โชติสกุล",
+      "นางสาวหทัยรัตน์ ประสงค์เงิน", "เนติพงษ์ ศรีดอกบัว", "NICHAPHA SUTHATA", "ปริตตา กลั่นช่วง",
+      "สมชัย วิจิตรไกรสร", "Sarinee Nueangphat", "ชารินี รุ่งสุข", "ศิรตา จันทะจิตต์",
+      "kittikhun petthong", "อณัฐภรณ์ กิติธรรมรงค์", "รัฐศักดิ์ ใจซื่อ", "Yothin Kingkan",
+      "อิทธิชัย วิเศษสุข", "ชนิกานต์ ปิยนุสรณ์", "เจษฎา สรีทอง", "แก้วกาญจน์ สังข์สุวรรณ",
+      "ศุถฤกษ์ แสงทอง", "คณิตสา ทวีสุวรรณไกร", "ตรีสุคนธ์ เกตุแก้ว", "ไพศาบ พ่อค้า",
+      "อาทิตติยา คล้องช้าง", "แสงสุรีย์ นิลพัฒน์", "สิรินภัทร นิลพัฒน์", "สิบเอกปิยพล ฐานบำรุง",
+      "สุพัตรา เผ่าพันธ์สร", "WASURAT ROTROKHA", "อาทิตย์ จันทร์สวาท", "นพพร แผนพงศภัค",
+      "สุมลมาศ ศรีบัวงาม", "Jakawan Meesomjit", "มีธรรม ช่อมณี", "สถิตย์ ใจอารีย์",
+      "ตฤษฐพร แก้วสุก", "nattaphon thamsopitt", "Suppawat Nakkasem", "ธนพล สารเดช",
+      "นายจิรัฏฐ์ โภคทรัพย์", "นางสาวไพลิน แจ่มอรุณ", "ญาณิศา เกล็ดจีน", "SUPAPORN SRILADEE",
+      "ฤทธิชัย ปิยะวาทิน", "นิรุต ทวีวัฒนพงษ์", "สุทธิภัสส์ เรืองเดชอังกูร", "สรศักดิ์ แจ่มเจริญ",
+      "มนฒ์เทียน เรืองเดชอังกูร", "วรวัชร์ อำพันโรจนานันท์", "ทศพล ขาววิเศษ", "รุ่งทิวา ขุมทอง",
+      "ตวงสิทธิ์ ชื่นวารี", "พีรพล สุทธสิงห์", "จักรกฤษณ์ ร่มโพธิ์ชี", "Chakchai Rungsook",
+      "สุชาดา วงศ์คเชนทร์", "จริยา พุ่มจำปา", "นำโชค นุชพุ่ม", "ศรสวรรค์ เดชผลิต",
+      "เกษรินทร์ น้อยอุทัย", "ฐิติพันธ์ น้อยอุทัย", "มนตรี สงข้อง", "Jarunee Onsom",
+      "Supatta RITTIDECH", "แสงจันทร์ แสงทอง", "จรัญญา บุระประทีป", "ภาณุมาศ เลื่อนลอย",
+      "ปิยาภรณ์ สีโพธิ์พันธ์", "จารุกิตติ์ วรรธนะบูรณ์", "Toni Toni", "สุกฤตา นาคะเสโน",
+      "ณัฐชนก เทพวงษ์", "ภัทรญา บริสุทธิ์", "อาภรณ์ โพธิ์ศรี", "ANUPOL KLINHOM",
+      "NUTTHA SWANGSRI", "Karat Thongsaiphon", "ณัฎฐา ชวนชม", "สุนิสา ขำเขียว",
+      "ณัฐนันท์ แย้มเกษร", "จารุณี เทพวัชรการุณ", "ศิวาพร พ่วงดี", "นางสุนันทา พัฒน์พันธุ์",
+      "นายสันติ พัฒน์พันธุ์", "กฤตมุข มุขโต", "ศิริพร เอี่ยมอินทร์", "ชวิศา สุวรรณสูร",
+      "Naruemon Nutchathat", "Phattararin Kaewphongpheng", "ณพัฒน์ ใยบัวเอี่ยม", "กฤษดา เดชเดชา",
+      "สุภากร หงษ์โต", "ปุณณ์นิษฐา เวียงสีมา", "นทีธร ปัญญาเลิศ", "สิริญากร สิงห์เถื่อน",
+      "นริศรา ใยเจริญ", "วชิรนนท์ เจริญสวรรค์", "คุณจิราวรรณ บริสุทธิ์", "ณภพ ภัทระเตชะสิน",
+      "คศิษฐ์ศักดิ์ สุวรรณอ่อน", "ปราณี ช่างทองดี", "Patit Kaewtip", "รณยุทธ โพธิ์น้ำเที่ยง",
+      "กัลยรัตน์ รักรุ่ง", "Nutthaphong Jitpierka", "อรทัย ดวงแก้ว", "Natthaphon Klinhom",
+      "จันทนา อ้นบุตร", "อัครรัชต์ พิมใจใส", "สิทธิพร อิ้ดแสง", "ศศิวิมล เพ็งสวย",
+      "ปุณยาพร ลิ้มภักดีสถาพร", "SUTITAYA UISRIKOON", "เจริญ ลีนานุวัฒน์", "รษา พวงเกตุ",
+      "สุทัศน์ ศรีวิเศษ", "บุญญฤทธิ์ ศรีสมุทร", "รังสิมันต์ พิทักษ์รัตนสกุล", "อรพรรณ พิทักษ์รัตนสกุล",
+      "ปัณณกิจจ์ พิทักษ์รัตนสกุล", "วรรณพร เจียงรัก", "วัชรียา เอี่ยมจันทร์จรัส", "คำพลอย โพธิ์ทอง",
+      "ทัศนีวรรณ แก้วปาน", "นัฐพล โพธิ์พันธุ์", "น.ส.กนกวรรณ มณีนิล", "ศศิธร ปานสมสวย",
+      "Wassana Dokpudson", "วิศรุตา ขุนเพิ่ม", "Beam Phonnapha", "Film Thirasak",
+      "ภานุพันธุ์ ศิริจันทร์", "อนุพล ปาสะกะ", "Harit ketsomboon", "จณิสตา ปรีชาถาวณิชกูล",
+      "เพียงนภา พลเสน", "นายศุธาสิน ธัญญเจริญ", "วารุณี โพธิ์พันธุ์", "สุภัทรชัย จำรูญบวรรัตน์",
+      "สุวรรณ แผ่นทรัพย์", "น.ส.มัทนา อ่อนสำราญ", "วิสุดา อ่อนโส", "ยติ สังข์ทอง",
+      "ชาญศักดิ์ พัฒนกิตติพงศ์", "สุรพงษ์ นัยยะพัด", "รวินญา เอี่ยมน้อย", "นายฉัตรชัย คำแป้น",
+      "รัชดาภรณ์ ศรีทอง", "จินตนา พวงดอกไม้", "Pornpailin Santiwong", "Susitha Rermsoongnern",
+      "Ittichai Rermsoongnern", "ฉันทนา กรับทอง", "ณัฐพล ศรีบัวคลี่", "ขวัญทิพย์ กุลจันทร์",
+      "ณัชชา นาคจตุรานนท์", "ภัทรนันท์ สุขย์ดวง", "ศิรภัสสร อิ่มกมล", "จุฑารัตน์ อุ่นจิตร์",
+      "Budsarakum tapmontha", "รุ่งแสง จันทร์คุณาสุขะ", "วิสาข์ เอนจินทะ", "ณัฐกฤตา ชาวสวนศรีเจริญ",
+      "ประสาน บุญลือพันธ์", "ณรงค์ อารีโรจน์", "ดณยา ขาวจุ้ย", "สุนทร ปานโทน",
+      "ทรัพย์สิดี พิทักษ์สาลี", "หรินโรจน์ ธนบูรณ์กาญจน์", "พูนลาภ วงษ์อัยรา", "Suchai Jeeranukosol",
+      "ศรีอาภา ไพโรจน์กัลยา", "พิมพ์พร บัวงาม", "นัฐกานต์ สุขละม้าย", "Nopphadon Phanthong",
+      "เศรษฐโชค ทองสา", "อาระยา บุญคง", "ปัทมา ชวนานนท์", "ปรารถนา เทพศรีหา",
+      "ปิยธิดา อินทร์สุข", "สมชาย คงใจดี", "ศิวพร ปั้นโอ้", "ทวีสิทธิ์ สุขศรี",
+      "สุภาพ แสงอินทร์", "ธีระพงษ์ เอี่ยมธีระกุล", "รจนา ปรีชาวิทย์", "วิภาวี ศรีมรกตกาญจน์",
+      "นางสาวสุนิสา เครือปาน", "ขจรยุทธ โตวรพันธ์", "รัศมี มณีนิล", "ชลาลัย ขาวพันธุ์",
+      "ดวงพชร สิงห์ทองเจริญ", "ณภัทร จักรสถาพร", "เชาวณัฐ ปิ่นทอง", "Aphisit Boonmark",
+      "อรอารียา ร่มโพธิ์ภักดิ์", "รุ่งนิภา ศรีคำน้อย", "Mhuntheph Patumsoot", "จุฑามาศ เพิ่มพูล",
+      "สุภาวรรณ อินทร์สุวรรณ", "ภานุพงษ์ แสงวันทอง", "จินตนา เจริญผล", "วรรณิดา ศรีดาเดช",
+      "Piyanat khemlek", "ณัฐพล ทวีสุข", "วสันต์ คาดการณ์ไกล", "มาริสา นามบัวศรี",
+      "ธานี ไธสง", "ขวัญข้าว สิงหะชัย", "ณัฐวัฒน์ ห้วยหงษ์ทอง", "พยุง บัวมี",
+      "Nisarat Detdecha", "กฤษฏิภัทธ เพียรสัมฤทธิ์", "Suthinee Supasorn", "นางสาวรัศมี เชื้อหนองปรง",
+      "suphachet wongsema", "พิชชาพร อังคทรัพย์", "ชัยพฤกษ์ ลิมปไพศาลสุข", "Wanalai Danthong",
+      "Nattaya Ittisan", "สมฤดดี แสงทอง", "ไพฑูรย์ ชาญชั่ง", "ธัญรัศม์ จันทร์สุวรรณ",
+      "น.ส.ณภัทร หอมระรื่น", "บุลวัชร์ ลิขิตวัฒนเศรษฐ", "อัมพร ทวีสิงห์", "อรนิต สุวินทรากร",
+      "Kanokwan Suksomjit", "ชลาคม ล้อเลิศสกุล", "สิทธิพร ปลัดจ่า", "ธเนส กาญจนครุฑ",
+      "ธนวัต เหล่าสุนา", "รัชสิรี จิตรนามกร", "นุช โตอดิเทพย์", "ใจทิพย์ ชินสุวรรณ",
+      "ธนพร อินทร์โอภาศ", "waranya khantong", "นุชรีย์ ศิริกุล", "ปริยากร สาราณียะพงษ์",
+      "เศรษฐ์ ภูภักดิ์", "อดิศักดิ์ ประคำมินทร์", "อาทิตย์ สุวรรณประดิษฐ์", "ปุณยาพร ดำสุขดี",
+      "พิมพ์รพี สิงห์ชุมพร", "กตัญญู ธูสรานนท์", "ปณิธาน ชูเชิด", "นิตยา มีสมพืชน์",
+      "พรทิพา อุ่นมี", "สมพร สึนทรวิภาต", "ปัญญา ศรีดำรงพันธุ์", "ศิรินทรา เก่งกิจการ",
+      "นายวัชรพล แสงวันทอง", "พชรพงศ์ คนเทศ", "Suntharee Jansaropas", "วรันต์ภัทร์ กลางปางรัตน์",
+      "พงศ์ทัต จรัสศรี", "ธนพรรษ พิมพ์ใหญ่", "Chatchai Rattanapanset", "Thanyalak Laongkaeo",
+      "พุทธิวัฒน์ อัครยศภิญโญ", "กรีฑา นาอนันต์", "Safe Tangthamniyom", "อารักษ์ บูรณากาญจน์",
+      "ธัญญามาศ สร้อยระย้า", "สาวินี สดบัวงาม", "ดำรงค์ชัย ฉิมพันธ์", "วรวลัญช์ สุริวงค์",
+      "บุญธิดา แซ่จัน", "เจษฎากร คุณวงค์", "สุรวิสาข์ แววนกยูง", "Tumpapon Seanthong",
+      "Natthawut Sapsin", "Yaowaluk Martvijit", "จันทร์เพ็ญ นพพันธ์", "ดารณี ชาวบุตรดี",
+      "ศิริลักษณ์ หลวงแก้ว", "ศุภภีมชัย พุทธิรังสิมาภรณ์", "ภคพร ลี้ธนะรุ่ง", "นายศักร์สฤษฏิ์ แสงฤทธิ์",
+      "พีรพล อุดมเดชรัตน์", "ศมีนา สุวรรณประทีป", "อาภาภรณ์ คุณหอม", "นางสาว ปราถนา มาแก้ว",
+      "นาย ฐิติวัสส์ สุทธิรัตน์", "ปัญจพร มาพลาย", "วรวัฒน์ เมธีวรกิจ", "กรกมล เมธีวรกิจ",
+      "เพ็ญพร ภู่พงษา", "บุษบา ภูผา", "ธนปัญญา รอดโฉมฉิน", "อัจฉรา เศรษฐจินดาเลิศ",
+      "นัฐพนธ์ หลักดี", "วัชรพร พันธุ์ศักดิ์", "สิริการย์ แก้วกาญจนาวรรณ", "อนพัทย์ คงวัฒนสิน",
+      "วชิราภรณ์ เกิดกิจ", "ขวัญชัย ฤกษ์เนตรี", "phuvameth treesuwannasam", "นายอานนท์ พีระพรเลิศ",
+      "Titipong Sangnet", "ปาจรีย์ ปักษี", "วาสนา เลิศวิลัย", "แสงระวี ใจซื่อกุล",
+      "Nannalin Attaparb", "สุทธิพงษ์ รูปขำดี", "นายปิยะพงษ์ ผลภาษี", "ชฎานุช ผลภาษี",
+      "วลีพิชชา ครองบุญ", "สันติภาพ สุยะใหญ่", "Kwanjit Pimpa", "มุกจรินทร์ แจ่มจำรัส",
+      "ปาณิสรา คุ้มฉายา", "กาญจนเดช เฉยไธสง", "ไปรยา ดีลี", "ศรีสุดา ร่มละมูล",
+      "ศิวดล ประพันธ์พิบูลย์", "สุพรรษา ศรีเที่ยงตรง", "นายวสันต์ ชิ้นปิ้นเกลียว", "ยืนยง ปราชญาพิทักษ์",
+      "วาสนา โทแก้ว", "ชยพล เจริญพานิช", "สาวิตรา ตนสารี", "ชัญญานุช จันทร์มณี",
+      "บังอร เวียงสีมา", "วิสิทธิ์ สุดประเสริฐ", "ฉันทนา สุดประเสริฐ", "รุ้งลาวัณย์ เจนศิริลักษณ์",
+      "Supanat buaphan", "คชาภรณ์ สอนบุตร", "Tatinoot Treeyakarn", "ฐิตินันท์ ฐิตินันท์สมบูรณ์",
+      "สุนิดา ตันสิริภัทร์", "ธนภรณ์พรรษ นรจีน", "วิริยา ศิลา", "อุบล สุวรรณพานิช",
+      "เรวัต สุวรรณพานิข", "พิชญ์สุภา สุวรรณพานิช", "อนุวัฒน์ จันทร์สคราญ", "เทพี ขันติวงค์",
+      "เขมจิรา อนุรักษ์ชาติกุล", "พรพรรณ ธนวรรณ", "สายดอน ขันติวงค์", "มลิจันทร์ ขันติวงค์",
+      "เยาวพา ธนรววณ", "พรเทพ ภรพรรณกิจ", "บุญศิริ พิบูลชัยนันท์", "มาลินี แสงทอง",
+      "ภีมพล ดอกไม้ขาว", "ศุภลักษณ์ ผาบจันดา", "ปทุมา ใจอารีย์", "ฐิติรัตน์ แก้วมี",
+      "คมสัน สีเทียนสุก", "พัชก์สวุฒิ ล้อไพศาล", "เดโช ทับทองดี", "รสธร พันธ์เพชร",
+      "ธีรพงษ์ อนันตธนมิตร", "นิคม พุทธทัน", "วิรัต แซ่โง้ว", "มนูญ พิชิ",
+      "ยุทธนา โค้วสมจีน", "สุรเชฎฐ์ กุคำใส", "Woraprot Thaneswanich", "อนุชา เกียรติกุล",
+      "อำไพ โพธิ์พันธุ์", "นิทัศน์ วัฒนการุณ", "ทศพร สุวรรณบุปผา", "นางปาณิสรา สุขสวัสดิ์",
+      "ณภัค ศรีสุวรรณ", "อุไรศรี ปิ่นนาค", "พวงทอง เขื่อนใหญ่", "องอาจ ปรือทอง",
+      "โยธิน คุณกิจชัยเจริญ", "แบงก์ ธนชิต", "Sanicha Koonprasert", "สุภัทตรา ฉัตรธรรม",
+      "Rangsimapon C", "Rungaroon Chattram", "จุฑาทิพย์ แสงใส", "อรรสิทธิ์ ปะวันนัง",
+      "ฉัตรชัย ทองมา", "ณิชากานต์ จันทร์ดี", "กุญชญา กลิ่นจุบัน", "สายฝน ขาวผ่อง",
+      "สว่างจิตร พันไธสง", "นิตยา มลานวล", "ปัทมา สุดโต", "รพิรัตน์ สุภากาศ",
+      "อรนุช ชิ้นปิ่นเกลียว", "ชวนพิศ สถิตย์พันธ์", "รุ่งนภา แย้มเนตร", "ศรันยา เดียววัฒนวิวัฒน์",
+      "ธนพร ช่อชู", "โอภาต ปิยะวาทิน", "Saranan Sangounsat", "อารีย์ สว่างศรี",
+      "ณัฐณิชา คงศิริ", "นพดล ลี้ธนะรุ่ง", "Panissara Khamphut", "นฤมนต์ ทรัพย์สินบูรณะ",
+      "กรัณย์ บุญช่วย", "กุลภัทรา นวกุล", "ณัฐจา พงษ์พิทักษ์", "นรินทร์ฤทธิ์ สุขวดี",
+      "ณรงค์ฤทธิ์ แจ่มศรี", "Pornthip Janjairuk", "อนัญญา เวียงสีมา", "เบญญาภา ด้วงนิล",
+      "เสกสรรค์ ประจำสุข", "ณัฏฐ์ณัชชา ธรรมมโนวานิช", "ด.ช ปฏิญญา ภาภิรมย์", "วิสสุทธิ์ รักอยู่",
+      "โสภา เนตรมณี", "นพวิชช์ กาฬษร", "จิรพงศ์ สุวรรณบุญฤทธิ์", "Natthaphat Tanwatthanaseri",
+      "น.ส.นาจยา พันธะ", "น.ส.วรรธนา ยิ้มสมบูรณ์", "์ีณัฐศริน ปิ่นเพ็ชร์", "นางพรทิพย์ มะหังสา",
+      "สุมัยมาลย์ วัชระศิลป์", "วรรณสมร วัชระศิลป์", "พราวฟ้า ลิมปิวรรณ", "ดาราณี กลำดบุตร",
+      "ทิพวรรณ พูลสุวรรณ", "บรรจบ ถิ่นบาง", "ภานุพงศ์ ชาวดอนคูณ", "สรยุทธ์ หุ่นประเสรฐ",
+      "กิตติยา แก้ววงษา", "อุษา แก้วศรีงาม", "จิรภัทร กัลยาณพจน์พร", "ชาคริต เขื่อนสุวงค์",
+      "ณัฐวดี เผือกหอม", "พลัฎฐณัณยา เจริญทับศรี", "สุพรรณ แร่เพชร", "การันต์ กิตติกรวงศา",
+      "ชุติมันต์ แก่นทองแดง", "พงษ์ยุทธ์ ชื่นชอบ", "อาทิตยา เนินสุวรรณสาร", "จุไรรัตน์ ระวิพงษ์",
+      "ณัฏฐวันณ์ ภูมิเมือง", "วาสุ บัวคลี่", "ทศพรบวร ปลาปูทอง", "Napaphat Bumrungyat",
+      "จิรากร เฒ่าจันทร์ด", "ณภัทร สุพรรนานนท์", "พัชรียา ทิพย์สัมฤทธิ์กุล", "ต้น คานทะจันทร์",
+      "ชื่นกมล เนตรชลายุทธ", "ชลธิศ ฉัตรฉาย", "ณัฏฐลภัส จันทร์เขชาสุจ", "อรจิรา อองดา",
+      "หฤดี ละมุลตรี", "ณัฏฐ์พิชา วโรดมอธิพัฒน์", "อภิวัฒน์ สรวยล้ำ", "Woot Suetrong",
+      "กัมปนาท มาลัยศรี", "นายอำนาจ บุญเกิด", "สุจิรา ยอดไม้งาม", "สวัสชัย ลิ่ม",
+      "กรรณิการ์ บุญเกิด", "เด็กหญิงณัฏฐณิชา บุญเกิด", "เด็กชายณัฏฐพล บุญเกิด", "พัสกร วงษ์วิหค",
+      "วรรณกานต์ โสภาสพ", "ธีธัช หงษ์โต", "อดินันท์ ชูเขียว", "รัญชน์วรัตม์ จันทร์แดง",
+      "Sarawut Nuthong", "ธรรมรัตน์ ดิษฐ์สุธรรม", "Panpidchaya Kruepankaew", "ปิ่นเพชร กาฬภักดี",
+      "รัตติยา จันทนาวิวัฒน์", "อธิวัฒน์ จันทนาวิวัฒน์", "Nantiya Dumrikitcharoen", "Chetsada Yasungnoen",
+      "นิพนธ์ ศุภฤกษ์นำชัย", "บรรจง พัวประเสริฐ", "อรัญญา กัลยาณพจน์พร", "รมย์ชลี อุบลทัศนีย์",
+      "สินีกันต์ ใจดี", "ฤดีโรจน์ สมบูรณ์ศิลป์", "จุฑารัตน์ เกษมสันต์", "วรรณาภรณ์ สุโภทัย",
+      "อาติพร ลิมปโกมล", "วริศรา เฑียรทอง", "สมชาย โชติกเดชาณรงค์", "พันธุ์กฤษณ์ บุณยวรรณเดชา",
+      "น้ำค้าง ทรัพย์มาก", "ชลธิศ นาคา", "เฉลิมพล แย้มเกษร", "น่านนทีพงศ์ กุลชนะเชาวน์",
+      "MR.AL Chuah", "จิรายุ ซ้อนเสียงดัง", "อภิชาต เฉลิมสงฆ์", "อัมภาภรณ์ เฉลิมสงฆ์",
+      "วรัญญา ทองโสภา", "ชูเกียรติ เล็กวงศ์ไพบูลย์", "นายธัญญะสิน จีนปี", "จรินทิพย์ อุทัยกุล",
+      "ภัทธิรา บริสุทธิ์", "ขจรพัฒน์ ธีรสิทธิ์วราธร", "เขมพงศ์ นิโลบล", "พาณิภัคน์ ช่วงโชติ",
+      "แสงเดือน งามเจริญ", "ปัณฑิตา อ่อนกล่ำผล", "รัชปภา ภิญญะโพธิ์", "ชนิดาภา ลอยวงษ์",
+      "มนันญา บรรจงพินิจ", "sanya meenil", "สุพิศ ขำพงษ์ไผ่", "ยรรยง ขำพงษ์ไผ่",
+      "สุวิภา สมบัติภิญโญ", "ปวีณา ธิติวรนันท์", "อัครพล ปานสุวรรณ", "อินทิรา จิตต์ใจดี",
+      "ภัทราภรณ์ จิตต์ใจดี", "ไพฑูรย์ ปัญญาภู", "กรรณิการ์ เอื้อทยา", "นิภาพร เอื้อทยา",
+      "ยุพา สดแสงสุก", "วรรษมน พรพิพัฒน์พงศ์", "ประชัยย์ ธัญรุ่งเรืองศรี", "Suthida Sakpinyochai",
+      "สำริด อารีชม", "พิมพ์ลภัส อุบลบาน", "วรรณศิริ กิจรุ่งพิพัฒน์", "ไพฑูรย์ กิตติสารวัณโณ",
+      "พาณิภัค กิตติสารวัณโณ", "วิทยา หิรัญกิตติกร", "Siriporn Klaharn", "สุดารัตน์ รอดหงษ์ทอง",
+      "คำเขียน คำเขียน", "ภาณุพงศ์ พิทักษ์ชุติเดช", "ชลธิชา กิจนำขัย", "มณฑา ปัทมเมธิน",
+      "ไพเราะ นิยมทอง", "อรรถชัย กลิ่นคำหอม", "ศรัณย์รัตน์ สุวรรณพงษ์", "สบันงา สุขบรรเทิง",
+      "กิตติญาณ์พร เจียวงทร์ทอง", "มนต์ชัย เลิศปรีชา", "ภานุพงษ์ แตงหอม", "กนกวรรณ ท้าวมิตร",
+      "กษุณา จำนงบุตร", "สุนันท์ ทรัพย์พูนทอง", "นเรศ วิเชียร", "อนุสรา หวานล้ำ",
+      "เอกภพ นัยพัฒน์", "พรพรรณ เรืองวารี", "อัญธิญาน์ รภัสอิทธิไมตรี", "กาญจนา น้ำค้าง",
+      "พิราวรรณ หนูอ้น", "ธนกร เจริญผล", "อัษฎาวุธ หงษ์เวียงจันทร์", "นางสาวปาณิสรา พลธร",
+      "นางสาวยศยา พลธร", "สมาพร เกิดโภคา", "อมรรัตน์ แก้วโกมล", "ทรงพล พูลพานิชอุปถัมป์",
+      "มานพ ขาวพันธุ์", "สมิตา สมจิตต์", "TuTa TomTam", "พัชรี รื่นโพธิ์วงศ์",
+      "วราพงษ์ พลอยพันธ์", "อิสรีย์ ขันธ์มั่น", "ลักษ์ชนก ชัยสิทธิ์", "จิรภา แก้วใหญ่",
+      "อัจฉราพรรณ ก้อนมณี", "พรพิมล จงรอบคอบ", "ญาณิศา แก้วสระแสน", "นางเพ็ญศรี เลิศทัศนวนิช",
+      "Prateep Phankawong", "ทินกร ชาวระหาญ", "เมธาวี ศรีบริบูรณ์", "รังสินี วรรณถิรหงส์",
+      "Bee Markrachan", "ทิฆัมพร ทองคำ", "รัตนาวดี เรืองวงศ์", "รจนา นักดนตรี",
+      "พิษณุ สะราคำ", "Pavarisa Srisatayasatien", "นางสาว อรอินทร์ ดนุลดา", "ปรัชญา นิลเมือง",
+      "เสริมศักดิ์ ลี้วิบูลย์ศิลป์", "เกตุนภา ลี้วิบูลย์ศิลป์", "ศิริพร กล้าหาญ", "ธุวพร สรุจชนาธิป",
+      "ชรินทร์ทิพย์ สกุลอธิวัฒน์", "รัตนสินทร์ สาริกา", "นัทธ์พณิษา เรืองเดชอังกูร", "นภเกตน์ ศิริวารัตน์",
+      "ศุทธินี จีนเกิด", "สุชาติ ทองประศรี", "ศรีผกา ทองประศรี", "วิชิต ยอดยา",
+      "ธรรมนูญ ปะสาวะเท", "สมเจตน์ ดอกไม้ขาว", "ณิชารัศม์ ธนสมบัติกุล", "วรรณวิสา จอบุญ",
+      "ปลื้มใจ โชติกเดชาณรงค์", "อารีพร ฉิมพลีศิริ", "มุทิตา ยิ้มสมบูรณ์", "บุญนำ เจริญมี",
+      "วสันต์ สถิตพรพรหม", "บัณฑิต เกษศรี", "ชัชวาล วีระบุตร", "พรพรรณ ศิริพรรณาภิรัตน์",
+      "ปราณี กลัมภบุตร", "สุพัฒน์ รบอุดงค์", "Papatsorn Watcharakhongsak", "Maliwan Watcharakhongsak",
+      "Naphat Watcharakhongsak", "เทพฤทธิ์ มาลาวัลย์", "กัลยา มาลาวัลย์", "สุภรัตน์ พลายเพชร",
+      "ทัญณภัทร หิรัญกิตติกร", "ภัสส์ฐิตา ศิริสุนทรรักษ์", "ประสิทธิ์ สุทธิศิริกุล", "เติมพร ธนวรรณ",
+      "นางสาวนิตยา ทองโสภา", "อุไรวรรณ พงษ์วาณิชอนันต์", "เสาวณิต นิ่มสุวรรณ", "ธรรมรัตน์ สิงห์จินดา",
+      "Pattapee Angkaew", "วิภาวรรณ อินสว่าง", "Wanpen Kunka", "ชมพูนุช ชูก้าน",
+      "สมถวิล เกล็ดจีน", "ทศพร สิงโสภา", "Kitisak Khampocha", "สุพรรณ แสงบุญนำ",
+      "ภูเบศวร์ ว่องกิตติพงษ์", "นายยุทธนา หนูนุรักษ์", "ธนกฤต ฉ่ำเอี่ยม", "ณปภา เพชรแสวง",
+      "จิราวรรณ คิ้วเที่ยง", "สุวรรณรัตน์ วุฒิเจริญโกศล", "Capt.Prayad Boonyupoo", "Kasama Suwiwattanachai",
+      "วรภร มากเทพวงษ์", "สฤษดิ์ เจิรญเนตร์", "เดชะ ผลอำไพ", "ณิชญา ม่วงเสน",
+      "ภาคิณ คูณสิทธิกุล", "มานนท์ แล่กูด", "Nattaya Kusol", "เกรียงไกร กาญจนอักษร",
+      "กมลทิพย์ แดงสมบูรณ์", "อาทิติยา แดงสมบูรณ์", "ณิชมน แดงสมบูรณ์", "พิมพ์รักษ์ เจริญดี",
+      "เกษราภรณ์ แซ่ฮิว", "สมชาย หนูดาษ", "ณฤดี หนูดาษ", "เนาวรัตน์ ศรีหิรัญ",
+      "ปานทิพ เสริมสุข", "สุนทรี ฟักขำ", "ดอกแก้ว เจือตี๋", "ธีระ นาคพึ่ง",
+      "นภาพร นาคพึ่ง", "สันติภาพ ขวัญแพ", "นารี รักประเสริฐสุช", "ชนกันต์ ขวัญแพ",
+      "สุชาติ อึ้งเจริญทรัพย์", "สุพรรษา ประทุมสูตร", "เรวดี เสร็จกิจ", "Apiwat Rungchao",
+      "วิจิตรา เนียมนิล", "Aof Apichit", "ธิติพร กันหาสารี", "รัตนโชติ พวงเงินสกุล",
+      "ไชยรัตน์ ปรีชาถาวณิชกูล", "สุธาพร โมกข์บุรุษ", "กรกานต์ จามพัฒน์", "ประภาศรี เชื่อมฉิม",
+      "Komtorn Orachai", "เครือวัลย์ สีสดดี", "ธนวัฒน์ สัตยารมณ์", "พัสตราภรณ์ ทัศนเจริญ",
+      "นายวรพล ทิพย์สัมฤทธิ์กุล", "นิชานันท์ ไชยสุข", "ณัฏฐ์ชญาดา เลิศสิทธิตระกูล", "อัมภาพร ผดุงหมาย",
+      "บุญมี ผดุงหมาย", "กนกวรรณ โพธิ์ทอง", "พรเทพ ผดุงหมาย", "ชวิศา ภาวิไล",
+      "สุพงษ์พันธ์ ทองสุขดี", "นางจิราภรณ์ ไชยฤกษ์", "พรเกียรติ ตู้จินดา", "ศิริพร พันสี",
+      "ปริญญา ชาวกงจักร์", "กุศลวัฒน์ ธำรงพล", "จารีย์ แก้วนาค", "THITIN KEADTHONG",
+      "Settapol Boonswad", "Thanatporn Inpata", "ปารดา ลมูลศิลป์", "กัลย์นภัส ภูสกุลวัฒน์",
+      "คณิตา จินดารัตน์", "เทอดพงศ์ มีเดช", "ชนากานต์ บุญประเสริฐ", "ภาณุพงศ์ สำราญพันธุ์",
+      "สาธิต ดอกกะเบา", "ณภัทร อุ่นกิจการเจริญ", "พรชนก นาคะประเสริฐกุล", "Nathaphat Thongpang",
+      "วิชาญ จินดารัตน์", "Vorrakul piboonsompornkul", "Palita Piboonsompornkul", "Wilawan Ploypan",
+      "ธีรนนท์ จันทร์ศิลา", "จิรภัทร พุ่มพันธ์สน", "ธัญชนก อุปละ", "สิริเกศ ชื่นนิติกุล",
+      "นิรันดร์ ณะแก้ว", "สินาทร โอ่เอี่ยม", "พุทธิภา รงค์ประเสริฐกุล", "วีรพจน์ เรืองเดชอังกูร",
+      "พีรพัฒน์ ภู่สิงห์", "ผุสดี ดอกสาคู", "ฉวีวรรณ พลอยสุกใส", "ศิริวรรณ รุ่มจิตร",
+      "สมคิด สรรพกิจเจริญ", "ณัชริญา เอี่ยมจันทร์จรัส", "Akom Wongkwanmung", "Arissara S.",
+      "Jeeradet A.", "พลอยไพลิน แตงโสภา", "ณัฐนิช อารยะจารุ", "พอดี อุปวรรณ",
+      "ธนวรรณ สว่างศรี", "พัฒน์เกษม เขียนแก้ว", "Patsharamon Hengtragul", "สุพจน์ พีระพิสิฐ",
+      "วรรณรมย์ ชินลี", "สิรินันท์ วัฒนศิริเกียรติ", "จุฑามาศ ใจมั่น", "อมรศักดิ์ แก้วปานกัน",
+      "ณัฎชพัธฐ์ เจนชัยจิตรวนิช", "กษิภัท น่วมละมัย", "รุ่งทิพย์ กิมชุ่น", "พรพรรณ คล้ายสุบรรณ",
+      "Kanoknate Thongsopa", "Jongchit Yohkeaw", "วรรณษา เยาะแก้ว", "มิ่งกมล ปิ่นทอง",
+      "ณปภัช ปัญญาสิงห์", "ภานุมาศ ตรีอัฐ", "ชนกนันท์ เจียมสมบูรณ์", "นางมณฑนา ศรีสุริยาพัฒน์กุล",
+      "น.ส.บุณยทรรศ เจือเมือง", "สุริยา ธาราพืช", "บุญรอด แก้วประหลาด", "วงเดือน บัวทอง",
+      "อุดม ใจมั่น", "นางสาวภัทรวดี ศรีธัญญากร", "ธรรมรัตน์ ปาละกะวงศ์ ณ อยุธยา", "นฤมล แซ่จิ๋ว",
+      "ไทรทอง ชาวบ้านกร่าง", "บุญปลูก เขียนดี", "วงศ์ตระกูล ปัสสะ", "สุนทรี รื่นโพธิ์วงศ์",
+      "นฤนุช หอมสุวรรณ", "Virat Upadee", "น.สลาวัลย์ อิทธิเมธืนทร์", "นางทองไส ยะบุญวัน",
+      "นางอุไรวรรณ สุขสำราญ", "สาวิตรี โพธิ์ตู้", "จักรพันธ์ อนุรักษ์", "ธนพัฒน์ บุญเหาะ",
+      "สิงหา ทองดี", "ธนอิน รอดโฉมฉิน", "ปรียนันท์ กีรติเลิศพุฒิกร", "ศิริพร ร่มโพธิ์ภักดิ์",
+      "สุชาดา ศีลาเจริญ", "รพีแพรว ชาดิษฐ์", "ชัยวัฒน์ ทักขพาณิชย์", "ศิริพร สอดสี",
+      "โยธิน อินสว่าง", "ดุสิต วัฒนะ", "กนกวรรณ นรากรมังคลา", "ฟ้าใส สีเทียนสุก",
+      "ชาลี ประสงค์ศรี", "นลินรัตน์ ประสงค์ศรี", "Osatee Ketsree", "พิเชษฐ ชูประดิษฐ",
+      "ธานินทร์ แก้วประพล", "ธิภาภรณ์ ร่มโพธิ์ภักดิ์", "ฐิติชญา แดนบุญจันทร์", "อุสาประภาวัต วิหค",
+      "นันทิยา สุขวดี", "ขวัญภูษิต แซ่จิว", "Pongsakorn Ditkeaw", "นิตย์ตรา สังข์ศิลปชัย",
+      "Yuttana Krajard", "นารี คุชิตา", "เกร็ดทอง ทองโปรย", "สมพร อ่อนพรม",
+      "ณัฐพล แก้วชนะ", "wisit manchupong", "Nawinda Impermpull", "พินิตเวท ภิญโญภูษาฤกษ์",
+      "ปฐมพร พิศวง", "Panida Choosrijan", "Somchai Pinthong", "อภิรักษ์ แก้วกาญจนาวรรณ",
+      "รุจน์ โรจน์อัศวเสถียร", "พริมรสา โรจน์อัศวเสถียร", "สุนัดดา ห้วยหงษ์ทอง", "พรหมมาศ มรรยาวุฒิ",
+      "เทียนชัย ศรีเจริญการกิจ", "สุพรรษา ศรีเจริญการกิจ", "ธเนศ ศรีเจริญการกิจ", "รุจิรา สุยะเหล็ก",
+      "วารี คำสกุล", "สุเวทย์ เฑียรทอง", "AREEPORN PHUMNGOENPHUMTHONG", "ภูมพันธ์ ภู่ทอง",
+      "พจนา ลาภยิ่ง", "สุนทรี มีจั่นทอง", "ชนาภา ปารมีศิลป์ขจร", "ธีรชาติ สุวินทรากร",
+      "กิตติพร สุดตา", "บัญชา ขะพินิจ", "ณัฐธิดา พุทธรังษี", "คธา หวังล้อมกลาง",
+      "เอียมโฉม สวนกูล", "น้องนุช บุญสุยา", "กมลวรรณ บุญสุยา", "กฤษณะ พันธ์ปาน",
+      "วิสุดา เตียงนิล", "โกวิทย์ นวมทอง", "ชุติมา นวมทอง", "ชวพล นวมทอง",
+      "นิสา หงษ์เวียงจันทร์", "กนกพิชญ์ เชื้อรอด", "วริศรา ทรัพย์สงเคราะห์", "กรรณิการ์ เมฆดี",
+      "ชาญชัย บุญญาคม", "เสาวลักษณ์ วารีรัตน์", "ดาวรุ่ง เมืองเหมอะ", "ดลฤทธิ์ กรรพฤิทธิ์",
+      "สอาด จันจาตุรงค์", "กาลัญญา ใจชื่น", "สกุล บัวคลี่", "วีรวิชญ์ ศุภศร",
+      "กฤตภาส สุวรรณโณ", "เยาวเรศ น้าประเสริฐ", "ธีร์ธวัช แย้มเกษร", "นายโยธิน อิ่มสุดสำราญ",
+      "พรรณรัตน์ ใจจ้อย", "ทศพล ใจจ้อย", "ไพลิณญ์ ทองธาวินสิน", "กันยาวีร์ คำภู",
+      "ณัฐพงษ์ วงษ์เดิม", "วราภรณ์ เฉลยสุข", "วันเฉลิม กรียินดี", "สมหมาย สืบศรี",
+      "ไพโรจน์ โคตบิน", "จินตหรา มาเพชร", "Krubert ประทุมสินธุ์", "นพนันท์ กวีกิจภากร",
+      "พรหมภัสสร กวีกิจภากร", "พ.ต.ท.หญิง ดวงตา ใหญ่กว่าวงษ์", "กมล กุมุท", "ชัยนาท จิ๋วแหยม",
+      "วัชรินทร์ กอกุลชัง", "จรัญ กอกุลชัง", "Watcharaporn Phopan", "Sivaporn Sahapol",
+      "Paramaporn Sahapol", "Ryuji Yanagino", "Kathira Thaweesakphakin", "Jindarut Panjengchan",
+      "สุรชัย สุนทรสมิต", "กฤกฤทธิ์ คุ้มฉายา", "นายการัณย์ วีระวงษ์", "พรพิมล คชสิทธิ์",
+      "ธราดล เกษศรี", "ธัญชนก เกษศรี", "เชิดศักดิ์ กฤษณชาญดี", "นาย ภูบดินทร์ กาญจนสมวรรณ์",
+      "พฤฒิพงศ์ หงษ์ศรีจัน", "ฐปนพงศ์ หงษ์ศรีจัน", "อรพรรณ แก้วจี๋", "นางบุญนำ กาฬภักดี",
+      "ปิติ กิติวงศ์วัฒนชัย", "พวัณตรี เกตุเห่ง", "Jakkapong Phetdisrisombat", "ณัฐรดา อากรชี",
+      "สุรินทร์ คำประดับเพชร", "ธงไชย ใจเที่ยงแท้", "อภิชาติ ปานอินทร์", "ดาวรุ่ง พลศรี",
+      "ประยงชัย ชัยบุญตา", "มินตรา ใจหาญ", "Attapol Suratreungchai", "อทิตยา ขำดี",
+      "ปาณิสรา ศรีสัตยเสถียร", "Chot Aiemkaew", "ภัคณิชชามณฑ์ ชุ่มสมบัติ", "กาญจน์บัณฑิต สนนุช",
+      "อำนาจ ศรีทองคำ", "ศันศนีย์ พันธุ์", "สุรีรัตน์ อ่ำแก้ว", "วรรณพร สุขแสง",
+      "พิมพ์ธิชา พฤกธารา", "พุธิตา คล้ายเผือก", "สารี โพธิ์ศรี", "ธรรมยศ ศรีสัตยเสถียร",
+      "วรัญญู อิ่มธนบัตร", "สุนทร มะเจียกจร", "อำนวยพร พันธุ์เกิด", "จิรวรรณ เกษระ",
+      "นิตยา น้อยพันธุ์ดี", "จิรพันธ์ ใจดี", "อำไพ วงค์สุวรรณ", "ปิยะวัฒน์ ลาสุวรรณ",
+      "ศศิธร ยิ้มเลี้ยง", "ดวงฤดี แจ้งใจดี", "นพดล กลำพบุตร", "ไพลิน ทองนิล",
+      "Jintana Insuk", "หลักทรัพย์ พิมพขันธ์", "ภัสราภรณ์ พิมพขันธ์", "เกศรินทร์ พิมพขันธ์",
+      "จรรยวรรธน์ อัครยศภิญโญ", "Nongluk Thanyapon", "อุษา สาครดี", "สุธี ยิ้มเลี้ยง",
+      "สาโรจน์ สดแสงสุก", "ปิยาภรณ์ อินทนนท์", "Supansa Tapnan", "เอกอุษณีย์ วิหค",
+      "ภัคพร คำอสง", "เนาวรัตน์ จรัสศรี", "อวัตถา ธรรมโสภิต", "พิมญาดา ภัทระเตชะสิน",
+      "ณษมา ภัทระเตชะสิน", "ณภษร ภัทระเตชะสิน", "ว่าทึ่ร.ต.หญิงช่อผกา สันทอง", "อรุณ ศิริโภคาทรัพย์",
+      "อภิสิทธิ์ พลายระหาร", "นพดล มาบุญ", "Jaroonwit Supasorn", "ภาสกร กันพงษ์",
+      "สุดเขต รักษี", "อรรถกร แนบเนียน", "ธนธรณ์ ทรัพย์วิริยะกุล", "ดุสิตา แย้มไสว",
+      "supachai Deemai", "วัฒนา ป้อมสกุล", "Thanakhan Sutchari", "มาริสา มีประเสริฐ",
+      "เบญจวรรณ คล่องคณิตสรณ์", "มณีดา บุญงาม", "อนุวัตร แห้วหาญ", "ปณณทัต อิ่มกมล",
+      "พัชญ์พิชา สมบูรณ์ผล", "Wimonwan Cholilitkul", "ไพโรจน์ ทองมุข", "ประวิทย์ อิ่มเอิบ",
+      "วิไล ดำสนิท", "นายมันเวล ศิริเซีย", "สุณีย์ โชคเฉลิมวงศ์", "สมชาย ชวนชม",
+      "phiwatn booncombha", "ธนากร รัตนสุขศรี", "ปัญญา อินสว่าง", "อำนาจ ชาวโพธิ์คอย",
+      "จันทรทิพย์ ชาวโพธิ์คอย", "พีรดนย์ ศรีวิพัฒน์", "วิไลวรรณ เตียบฉายพันธ์", "พัชรภูมิ พันธ์แขก",
+      "พรชิตา พันแสนแก้ว", "จรัสเพชร ชิ้ววงษ์", "Silp Sritonkkum", "Chirawat Poonsab",
+      "Nattapon Seetaweerat", "ยงยุทธ พันตาวงษ์", "สุจิรา อ่วมคำ", "อนุสิกข์ พันตาวงษ์",
+      "จิณัฐตา พันตาวงษ์", "สันติ พระชาติ", "ปิยพร วงษ์ศรีสังข์", "สุพจน์ ไชยบุญญรัศมิ์",
+      "กฤติยานันท์ ไชยบุญญรัศมิ์", "พิชญนันท์ ไชยบุญญรัศมิ์", "วีระโชค แก้วเรือง", "นายสิทธิโชค ภาภิรมย์",
+      "นิร้นดร์ ชะโนภาส", "รัชนีกร ชะโนภาส", "นิศารัตน์ ชะโนภาส", "สุทธิดา พรหมใจบุญ",
+      "เด็กชายก้องนภ เยประยูร", "พิชญาพรรณ ชมภูประเภท", "IT WANNATIRAHOUNG", "สมยศ นัดแบน",
+      "Suthilak Traiwan", "อรอนงค์ มั่นซื่อตรงดี", "ศรัญญา เพ็ชรรักษ์", "ชลธิชา ศรีบุญเพ็ง",
+      "สมพงษ์ คงทอง", "วนิดา สละคำ", "กัญญาวีร์ หลักเพชร", "สราวุธ อรุโณทัย",
+      "วีรยา คงเขียว", "ทิพย์คำพร ตราชู", "วันชัยร์ ปานพ่วง", "จริญญา หนูนุรักษ์",
+      "ชลาพันธุ์ เพ็งสมยา", "ณัฐพงษ์ เพ็งสมยา", "อาทิตย์ ยอดสถิตย์", "อัครพงษ์ พุ่มมูล",
+      "นายประจักษ์ รุ่งกำจัด", "นางสาวเกษร จันทร์สุวรรณ", "นายเจษฎา บัวกระสินธุ์", "นางสาวสิริณัฏฐ์ ภาสร้อยเพชร",
+      "Wuttichai Phophan", "Tanida A", "นายเอกสิทธิ์ ออมสิน", "นายศรชัย ฉัตรแก้ว",
+      "นางพีรณุช ฉัตรแก้ว", "ผกาพันธ์ คงทวี", "Suphot Phohiran", "สุธารัตน์ ตึ๋งพันธุ์",
+      "ลัดดาวัลย์ ตึ๋งพันธุ์", "นายศรายุทธ อู่อรุณ", "บุหงา สะอาดดี", "รุ่งนภา บุญมี",
+      "ธเนศ วงศ์สง่า", "อังคณา กลิ่นหอม", "ธีรยุทธ รสชุ่ม", "Nattawoot Meenil",
+      "Nopporn Rattanathongkong", "Intuch Kaewngam", "เกรียงไกร ศิลปชัย", "ชาตรี ศิริธรรม",
+      "ณัฐา ศิริธรรม", "ลภัสรดา เทียนเถาวัลย์", "ปาริชาติ แยกผิวผ่อง", "ไอส์ โยประทุม",
+      "ภควัต สมสนิม", "จารวี ศรีโปฎก", "สันทัศน์ น้อยเพ็ง", "วรรณดี น้อยเพ็ง",
+      "พรรณภัค น้อยเพ็ง", "ธีรภัทร์ นัยเนตร์", "สาวิตตรี อุดมผล", "อรวรรณ แห้วหาญ",
+      "แพรพลอย ปิ่นสุวรรณ", "นางสาวหลินฟ้า โชคนิธิทรัพย์", "ชลิต จิตตนาคินทร์", "สุรีรัฐ เณรจาที",
+      "สุดารัตน์ สุดโต", "ดวงนภา สุดเส็งพันธุ์", "ธนกร นาคชาตรี", "กมลลักษณ์ แสนบูราณ",
+      "EKAPHOP JANGKAEW", "Phayao Buachaem", "Smernard Buachaem", "Waritsara Buachaem",
+      "ธนะชัย จาดจร", "อำนวยพร แก้วประพล", "มลทิพย์ เล็กสมบูรณ์", "สุจิตรา ดอนจันทร์ทอง",
+      "ณัฐกฤตา ปัทวี", "ผาสุข ปิ่นแก้ว", "วลัญช์รัชด์ ภัทรสิทธินันท์", "ภัทรพร เจริญดี",
+      "รุ้งเพชร อรุณรัชฎารมย์", "ธวัช พันธุ์เสือ", "ภูริเดช พันธุ์วงษ์", "ณัฐชัย สนธิเณร",
+      "ภัทรพงศ์ เทียนทอง", "Warunee Dangsakul", "ณภพ อมรปรีชาชัย", "สุภฤกษ์ ทองสุขดี",
+      "ภูริณัฐค์ ชมทะเล", "Sakhon Pattanamart", "มาลัย พลายจิตต์", "ปราสาท เจริญธรรมรักษา",
+      "นายชื่นชัย มะหังสา", "คณิตศาสตร์ อวิชา", "ฐิติธนา กาฬภักดี", "ณัฐกานต์ เอี่ยมอัมพรพงศ์",
+      "ณภาภัช โรจนกุล", "ณภัทร แสงอินทร์", "ภูษิชา สิริเดชาภัทรา", "กิรณา ขจรภัย",
+      "เมธัส อวิชา", "วิไล เฑียรทอง", "วิทยา หทัยปิติสุข", "นายวสิษฐ์พล สุวรรณประทีป",
+      "สินีนาถ สว่างศรี", "กฤตภาส ลอยจินดารัตน์", "โสฬษฒ์ เทพสถิตย์", "CHAMAIPHORN PHICHAIPANIT",
+      "MOLRUDEE SUKSATIAN", "JANTARAT DACHSAKULRAT", "PATCHARIN JANKLANG", "ARAYA POMTHONG",
+      "KUNAKORN WONGDENDOUNG", "ROONGLAWAN NOKKRATOK", "SIRIWAT KERDMAK", "NATASHA YENPRASERT",
+      "TRINNAKORN WONGDENDOUNG", "ประมวล มิตรราตรี", "นภาพร อุ่นประดิษฐ์", "อัจฉรา ปานบ้านเกร็ด",
+      "ชาญชัย ศรีมณฑก", "พันธุ์ทิพย์ กุศลพุทธรักษ์", "พิมพ์มาดา ทองประศรี", "ประทีป ดอกมณฑา",
+      "ประณิธิ ดอกมณฑา", "สริตา ดอกมณฑา", "อนงค์สุภางค์ ยุงคุณธนกิตต์", "Thanee srichai",
+      "บุญฤทธิ์ นนท์แก้ว", "ดารวรรณ ธูปแจ้ง", "ชาติชาย สังข์วิลัย", "สุทธิ์วรรรณ สังข์วิลัย",
+      "patcharin soontornwipat", "Teerasak Muakpetch", "ชาญ บุญถนอม", "อุสา ปรีชาวิทย์",
+      "พลกฤต ปรีชาวิทย์", "ณัฐิกา พรหมเสนา", "KRAISORN SONGSERM", "Gugky Jid",
+      "สุจารีวรรณ สมพร", "ชาตรี มณีนพรัตน์", "วรัชยา สิทธิ", "ประจักร ศรีสวนแตง",
+      "วันเพ็ญ แสงอินทร์", "สุนทร แสงอินทร์", "พินิจ โพธิ์พันธุ์", "ปนัดดา เสนารินทร์",
+      "อำนาจ ใจซื่อ", "นายไตรรัตน์ เรืองประชา", "นางสาวเมตตา เรืองประชา", "ธีรวัจน์ กิตติกรวงศา",
+      "พรชัย จ้อยจำรูญ", "Kanokporn Pungtamkerdpol", "อังคณา สวัสดิ์ดิเรกศาล", "กุลวลี อุทัยธรรม",
+      "Prasaniya Theanchai", "Kanyapak Theanchai", "อติเทพ จันทร์ประสพพร", "Chatchada Sasiopas",
+      "Sakda Sasiopas", "Wantana Thongrat", "ฝนทิพย์ เบ็ญจมาศ", "นายประทับ บูชา",
+      "Sali Lohasiri", "จริยา บุญขันธ์", "พัชรี พรมเจริญ", "ชัชออน ทองคำ",
+      "วรรณยา ศิริวรรณ", "กัญญ์ธนนันท์ จิตรนพคุณ", "นายเทพชนินทร์ เกิดบัว", "Chanyut Chaisri",
+      "ณรงค์ศักดิ์ สิรินพมณี", "อุษา แย้มทับทิม", "Siwakorn Somchariya", "สายชล พูลเพียร",
+      "กนกเนตร ทองโสภา", "เกษมพันธ์ ฐานิตสรณ์", "พงศธร เลิศทัศนวนิช", "นิตยา งิ้วไธสง",
+      "ปภากร จันทร์สุวรรณ", "นายภูมภัสส์ พิสิฐเรืองเดชา", "เอนินทร์ พิสิฐเรืองเดชา", "Chirasak Jongchansitto",
+      "วรัญญา วงษ์เม่น", "อรจิรา เสาเสริมศรี", "วศิน น้าประเสริฐ", "แก้วตา ทรดี",
+      "ชนิดา ลิขิตถาวร", "นางสาวชลธิชา ภู่บุญ", "นายแมน กาฬพักดี", "นาย ประกอบ ยวงใย",
+      "อภิณญาณ ครุฑวิลัย", "ธนันณัฎฐ์ ศรีสัตยเสถียร", "Manunchaya Sintusuwan", "Sala Waichata",
+      "ดวงตา ใหญ่กว่าวงษ์", "ศิริลักษณ์ พลายเพชร", "ศิริวรรณ รอดโฉมฉิน", "นพดล สีโมรส",
+      "นันทิยา สีโมรส", "นันธวัช กล่ำเคลือ", "Nichapat Chawchai", "ปทิตตา อมรปรีชาชัย",
+      "อังกูร สุทธิประภา", "ปุญญณันท์ สุระสังกาศ", "ปริยากร สู่เจริญ", "Apichad Tamjadee",
+      "ชุติเดช ศรีสุริยสวัสดิ์", "อารีวัน หนูทอง", "Wanthanai Jaisuparp", "วิทยา สุขสถาวรพันธุ์",
+      "วนันสิริ สุขสถาวรพันธุ์", "ปรานต์ชญาน์ สุขสถาวรพันธุ์", "ธีร์ปกรณ์ สุขสถาวรพันธุ์", "ภพภูวัสส์ นามปพนอังกูร",
+      "ณัฐธิดา บุญแพ", "พรพรรณ ศรีรุ่งเรือง", "รวิ เจียโชติกุล", "RATCHADAPORN DITKEAW",
+      "PIMOLRAK SOITEAN", "KANYANAT DITKEAW", "จิราวรรณ อินธิยา", "เสก โชสุภาพ",
+      "จักรพงษ์ ชัยโอรส", "ทวีศักดิ์ ใจสัจจะ", "เครือวัลย์ อินทขันตี", "พัฒน์ รักพงษ์",
+      "ชลธิชา สว่างศรี", "นรินทร์ทิพย์ แสงมณี", "สิรินทร์ แสงมณี", "ณัฏฐนันท์ แสงมณี",
+      "เจทาโบท เจท", "กัณฑพร เรืองศรี", "หิรัญวดา มุสุ", "พัฒนพงศ์ สังฆพันธุ์",
+      "ธัญพร พุทธรังษี", "วิรวิชญ์ ศุภศร", "นาย ศุภกิตติ์ เคหะนาค", "รัชชานนท์ บรนลือทรัพย์",
+      "ธานี พระชาติ", "ฐิติศักดิ์ วิเศษวงษา", "ภาพิมล สมตัว", "รุ้งตะวัน ผิวแดง",
+      "วราภรณ์ อินสว่าง", "ศิริชัย ผิวแดง", "รภ้สรัญขน์ ผิวแดง", "สายฝน ลันทม",
+      "พิวัฒณ์ บุญคำภา", "พัทยา สมใจเพ็ง", "ปกป้อง คงเพชร", "จรัญ โสภาพันธ์",
+      "Phaksaranthorn Punyathanasap", "กันต์รพี ปัญญาภู", "นายสิทธิศักดิ์ มนต์จริยาพร", "อภิสรา โพธิ์ไพจิตร",
+      "อาชวิน เคหะนาค", "ธนกฤต พันธ์ปาน", "กัญญาณี เงินชัยโรจน์", "จรูญวิชญ์ ศุภศร",
+      "นายนัฐพล คำแสนราช", "นางสาวสุรีพร ขาวฉ่ำ", "อรวรรณ ศรีหมากสุข", "KRISORN FAKCHANG",
+      "วรรษพร รัตนะ", "คมกฤทธิ์ สุขจิตต์", "โสมประภา โชคประดับ", "สุนันทา แห้วเพ็ชร",
+      "อริษา พูลกำลัง", "อานนท์ อ่ำบุญ", "Apichaya Waichalad", "ธนายุทธ กลิ่นประทุม",
+      "น.ส.นฤมล พุ่มสำเภา", "เบญญาภา ใจมั่น", "ณัฐวัฒน์ ชูสวัสดิ์", "สุรินทร์ อุบลบาน",
+      "กานต์รวี ช้างดี", "กฤษฎา ขาวพันธุ์", "ปรัศนีย์ วงศ์นารัตน์", "ทรงภณ วงศ์นารัตน์",
+      "ฐิติมา สวัสดี", "อภิชา อมรปรีชาชัย", "วิภาดา เหรียญทอง", "ศิริพร สว่างศรี",
+      "จินตนา พุทธชาติ", "กันอเนก ช้อยหิรัญ", "สาธิตา ทองเอก", "นวรัตน์ จันทร์หอม",
+      "ณัฐพงศ์ จันทร์หอม", "ปรัตถกร จันทร์หอม", "ณัฐนิชา จันทร์หอม", "สุริยัน สาทกลาง",
+      "วราลี จันทร์เงิน", "วันนพ ชุมสุวรรณ", "สมศักดิ์ ดอนจันทร์ทอง", "Ggolf Grap",
+      "ศิริพร น้ำใจดี", "ดวงพร เพชรวงค์", "วาสนา น้ำทิพย์", "เสาวรัตน์ เขาแก้ว",
+      "ทัศหทัย ศรีสุข", "ธัญชนก วงษ์พาเหียณ", "มุทิตา อนุสรานนท์", "ปุรเชษฐ์ คงถาวร",
+      "นางสาวนรมน ปิ่นทอง", "Pichpon Boonkongsen", "Tisanamadee Silae", "นานภูมิเทพ ศรีผุดผ่อง",
+      "นางสาวปภาวี รื่นโพธิ์วงศ์", "ดอกอ้อ คงวิเชียร", "เจษฎา อู่สุวรรณ", "ศรณ์ฉัตร คชอ่วม",
+      "กรพินทุ์ ปานวิเชียร", "ภั​​สรา สมใจ​เพ็ง", "วีรยา เดชอัมพร", "นรินทร์ โพธิพล",
+      "ท๊ฆทัศน์ รักอยู่", "พิมพ์นิภา อัคระมณีรัตน์", "ณรงค์ศักดิ์ แสงปัญญา", "ศรีเมือง ทองอุ่น",
+      "เกษศิรินทร์ พิมพ์ทอง", "นางจันทร์เพ็ญ ยศศักดิ์ศรี", "นางกาหลง ประเสริฐสุโข", "เกษม ประเสริฐสุโข",
+      "นางสายชล ศรีอ่อนดี", "นายเรืองเดช ประทุมทรัพย์", "นางต้อย ประทุมทรัพย์", "กิติพัฒน์ บุณยรังควร",
+      "กันตวัฒน์ เขตนคร", "กันตวัฒน์ บุณยรังควร", "พีรวิทย์ ทองเหลือ", "สุธินี ศุภศร",
+      "นายสมบัติ เจริญลาภ", "นายศรายุทธ เจริญลาภ", "สมบูรณ์ แก้วจี๋", "Mr Hu Yu-Huan",
+      "Runanapa Boonchuay", "นัทพล พรหมพินิจ", "ชัชฎาภรณ์ เพ็งสมบูรณ์", "ณัชปภา ไกรรอด",
+      "ดวงตา ไกรภัสสร์พงษ์", "ศิริพรรณ ธนันชัย", "Chookiat Cowsuwan", "Kingdao Cowsuwan",
+      "วุฒิกร รงค์รัตน์", "Siriporn Sommapee", "ดลกมล น้ำค้าง", "กัลยาณี จันทร์สวาท",
+      "นภา พรหมสวัสดิ์", "สมชาย สงสัย", "นายศตวรรษ ใจม้น", "Nachutiphat Punyathanasap",
+      "เตชวิศ พูลพานิชอุปถัมป์", "ชญานิศวร์ ปทุมานนท์", "สาวิตรี สาระบรรณ", "ณัฐพงษ์ เพิกอาภรณ์",
+      "กนกวรรณ ลิ้มศรีเจริญ", "ชาตรี ตั้งพัฒนสมบัติ", "กรรณิกา นาคทับที", "เกษมณี พึ่งนุสนธิ์",
+      "นางเอมอร แม้นพวก", "นายวิเชียร แม้นพวก", "อินทิรา วงษ์ประพฤติดี", "ธีราพร โสขุมา",
+      "พงศ์์ธร หนูนุรักษ์", "พิสิฐ จิระรัตน์", "เรณู จิระรัตน์", "ธนภรณ์ ทองสา",
+      "วิทูลย์ จันทร์ไกร", "อริญญาณ์ คงสุข", "อารยา จันทร์ไกร", "วุฑฒา สว่างสุภากุล",
+      "ปริวรรษ ดอกตาลยงค์", "วิม เอี่ยมหรุ่น", "สมบัติ เอี่ยมหรุ่น", "ปวริศร หาญทะเล",
+      "Hatairath Ngiwngam", "Theerawut Klaysuban", "ธนาพัฒน์ ศรีวิเชียร", "ธนวัฒน์ รักการธรรม",
+      "ณัฐพร โมลาดุก", "อริยวรรณ์ อิ้วหะซั่ว", "พิมพ์ชนก อิ้วหะซั่ว", "กิติยา สว่างสุภากุล",
+      "กัฬจพัฒน์ ใยบัวเอี่ยม", "กัลช์นิพัส ใยบัวเอี่ยม", "Nuanchan Kodist", "น.สนวลจันทร์ แซ่เท้น",
+      "น.ส.นันทนา แทนแสงทอง", "วราภรณ์ มาโสมพันธ์", "อารมย์ เทาดี", "ประยงค์ เทาดี",
+      "ปารีณา ศรีเมือง", "รณกร ตันวัฒนเสรี", "ศิริชัย เที่ยงตรง", "วรางคณา เย็นทรวง",
+      "อรรณพ สุขขำ", "เบญจมาศ สุขขำ", "เบญญาทิพย์ เกตุษจันทร์", "จรรยา บุญทา",
+      "กฤษณะ สิงห์บุตร", "ศิวสิทธิกร จันทร์ศรี", "สุดา อินวง", "ธรรมศาสตร์ ศรีสัตยเสถียร",
+      "พวงบุปผา เสาวรส", "น.ส.นาตยา พันธะ", "นางอรุณศรี ปาณิวรรณ", "Niracha Chaiyachot",
+      "Jarkkit Sangsukdee", "อรสา อยู่เปี่ยม", "อัมพร มิตรประสิทธิ์", "อัยญภา จิราวัชรธนา",
+      "รติรส โพธิ์อ้น", "จิรยุส อุรดิส", "อิสรพงษ์ อินสว่าง", "ศิริพร ขำวงษ์",
+      "นฤภัทร ยังปรางค์", "สุธินันท์ เฉยพินิจ", "อุดมพฤกษ์ กรีธาธร", "ชูเดช เขียวสละ",
+      "วิรัช เขียวสละ", "Montita Yimsomboon", "ชนิพร ประทุมรัตน์", "สิทธิศักดิ์ รัตนพาณิชย์",
+      "ณัฏฐินี รัตนพาณิชย์", "นริสรา กาละพงษ์", "ณัฐวุฒิ กาละพงษ์", "ปานพรรณ พะลัง",
+      "รุ่งรัตน์ ศรีวิเชียร", "นิชานันท์ สะอาดดี", "Pakkapong Arkornchee", "ปาณิสรา โสวรรณรัตน์",
+      "นางสาววาสนา ลี้เจริญ", "จรรยารัตน์ ทับโชติ", "ทินกร จอวัน", "สุธาศินี อุ่นคำ",
+      "นางอัจฉรา คงจัด", "Jutamas Suwanpakdee", "จารินี ถิรภัทรพันธ์", "น้ำตาล โกลากุล",
+      "อิทธิพล โกลากุล", "สมใจ บุญมี", "สุภศิษฏ์ ธีรสิทธิ์วราธร", "Sutap Inswang",
+      "ยุทธนา คงมาก", "Sukgarin Moonlaong", "นายประเสริฐ ปาลกะวงศ์ ณ อยุธยา", "นางปทุมมา ชโลธร",
+      "นางสาวธีรพร ใจวิวัฒน์พงศ์", "ชวัสรัฏฐ์ นาคแสงจันทร์", "ศิลา คชาพันธุ์", "ลักขณา คชาพันธุ์",
+      "ปิยธิดา มั่นคงดี", "โสภณ สูนหอม", "ฐิติวัฒน์ สิทธิชูรักษ์", "อุทัยราชันย์ มาตเลิง",
+      "รัชนก เทียนเจริญ", "นายอุดมศักดิ์ ร่งราตรี", "ประพิมพร มุทุกันต์", "ปฐมพร จำปาเงิน",
+      "วิชุดา ประดิษฐกุล", "ศิริลักษณ์ สว่างศรี", "ปภาวิน กิจสาลีรุ่ง", "สุเทพ นิ่มนวล",
+      "พรรณิภา ชยะสุนทร", "อรพรรณ พานทอง", "นนท์ ไชยวงศ์", "รานี เทพทอง",
+      "เจติญา ไชยวงศ์", "ณัฏฐิญา ไชยวงศ์", "ธัญญ์นรี ไล้สุวรรณชาติ", "จินตนา กฤษณชาญดี",
+      "ปรีย์ธิดา สมจิตร", "ขนิษฐา สุภาพรูป", "ณัฐวุฒิ หลักกนก", "เริงยุทธ ไกรรอด",
+      "นายอุดม พรทิพย์ศิริกุล", "ศิริพร เชื้อนิล", "ปภพ ศรีเพชร", "จันทร์พิมพ์ วงศ์ประชารัตน์",
+      "ปวริศา บัวสิงห์", "ธีรยุทธ์ กิจรันต์", "จรรยพร ศรีเมือง", "กมลทิพย์ หาญทนง",
+      "นันทพัทธ์ ตาลรักษา", "อภิญญา ตาลรักษา", "กันยารัตน์ ม้าวิไล", "ไพบูลย์ เชตุพันธุ์",
+      "ณัชชา เชตุพันธุ์", "วัชรพงษ์ ชาวประทุม", "ศุภกิจ จิตรอารีย์รักษ์", "สมพิศ จำปาเงิน",
+      "เสมา ธรรมจักร", "มัทวัน เพชรวัตร", "สมพงษ์ ลิ้มอิ่ม", "จิตติมา พันธุ์ขะวงษ์",
+      "อำนวย ด้ศกัมพล", "กลอยใจ จันทน์ฉาย", "นายปริญญา เอื้อน้อมจิตต์กุล", "นายวีรภัทร สุธีรางกูล",
+      "นางปวีณา สุธีรางกูล", "นางสาวสุพัตรา จงวิบูลย์", "นางสาวนฤมล ตากะชาติ", "วณิชย์ เอื้อน้อมจิตต์กุล",
+      "นางสาวฐิตารีย์ เธียรสุทัศน์", "ดช.ปัณณ์ สุธีรางกูล", "ดช.ปัณฑ์รพล เอื้อน้อมจิตต์กุล", "วัฒนศักดิ์ โลหะศิริ",
+      "วรรณกร สำรวมจิตร", "นางยอดขวัญ รัศมี", "ณัฐพงศ์ ประสพ", "สุพรรณิการ์ ปิ่นเกตุ",
+      "สโรชา พีรพัฒนภูมิ", "เยาวรีย์ คำดีธนารัชต์", "ภควดี เจริญปัญญา", "ศุภมิตร อินทขันตี",
+      "อัศนี ป้อมคำ", "พุฒิพงษ์ วงษ์มณฑา", "อนันดา อังคะชัยวนิชสกุล", "พิมพ์ใจ ตุดตะเวช",
+      "ทิพภาณี คนึงคิด", "พุฒิพงศ์ สำราญพานิช", "คมกฤช ประภาทรง", "ทรายทอง โลโสดา",
+      "Peerapat Phophan", "ไอริณ คลังทรัพย์", "ปรีชา อัยรารัตน์", "กรรณิกา อัยรารัตน์",
+      "วัลลภา ร่มโพธิ์ภักดิ์", "Pasin Chuenchujit", "Apichaya Ruenjaimun", "ขนิษฐา พันธุ์สุวรรณ",
+      "Srirat Nakkien", "Somkanay Pongsomboon", "Watunyu Panghom", "เฉลิม บุญโชติ",
+      "คงกฤช โพธิ์แฉล้ม", "Thawat Jirawatthanaphan", "นิตยา จันทร์ลอย", "รัชนี สวัสดิ์มี",
+      "สุธีวรรณ ศรีสุข", "Kusuma Pongsakdee"
+    ];
+  </script>
+
+  <!-- Real-time Synchronization & Stage Engine -->
+  <script>
+    // ฐานข้อมูล Firebase เดิมของคุณ
+    const firebaseConfig = {
+      databaseURL: "https://my-scoreboard-e41b7-default-rtdb.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Local Variables
+    let availableParticipants = [];
+    let customPrizesList = [];
+    let winnersHistory = [];
+    let currentPrizeIndex = 0;
+    let autoPrizeFallbackIndex = 1;
+    let selectedDurationSec = 8;
+
+    let isDrawing = false;
+    let shuffleAnimationTimer = null;
+    let localRollInterval = null;
+
+    window.onload = function() {
+      setupKeyListeners();
+      listenFirebase();
+    };
+
+    // เชื่อมต่อดึงข้อมูลจาก Cloud และดักจับความเคลื่อนไหว Real-time
+    function listenFirebase() {
+      db.ref('marathon_draw').on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        // หากใน Firebase ยังไม่มีข้อมูล ให้สร้างชุดเริ่มต้นขึ้นไป
+        if (!data) {
+          initDefaultFirebase();
+          return;
+        }
+
+        // ดึงสถานะปัจจุบันมาอัปเดตลงเครื่อง
+        availableParticipants = data.availableParticipants || [];
+        customPrizesList = data.customPrizesList || [];
+        winnersHistory = data.winnersHistory || [];
+        currentPrizeIndex = data.currentPrizeIndex || 0;
+        autoPrizeFallbackIndex = data.autoPrizeFallbackIndex || 1;
+        selectedDurationSec = (data.selectedDurationSec !== undefined) ? data.selectedDurationSec : 8;
+
+        // อัปเดตข้อมูลในหน้าต่างตั้งค่า (Modals)
+        document.getElementById('participantsTextarea').value = availableParticipants.join('\n');
+        document.getElementById('modalParticipantCount').innerText = availableParticipants.length;
+        document.getElementById('prizesTextarea').value = customPrizesList.join('\n');
+
+        // อัปเดตสถิติและตาราง
+        updateUI();
+
+        // ตรวจสอบสถานะการหมุนสุ่ม (Sync ข้ามเครื่อง)
+        handleDrawingStateSync(data);
+      });
+    }
+
+    function initDefaultFirebase() {
+      const cleaned = [...new Set(DEFAULT_PARTICIPANTS.map(n => n.trim()).filter(n => n.length > 0))];
+      db.ref('marathon_draw').set({
+        availableParticipants: cleaned,
+        customPrizesList: [],
+        winnersHistory: [],
+        currentPrizeIndex: 0,
+        autoPrizeFallbackIndex: 1,
+        selectedDurationSec: 8,
+        isDrawing: false,
+        lastWinner: "",
+        lastAwardedPrize: "",
+        triggerEventTime: 0
+      });
+    }
+
+    function updateUI() {
+      const remaining = availableParticipants.length;
+      const drawn = winnersHistory.length;
+      document.getElementById('statRemaining').innerText = remaining.toLocaleString();
+      document.getElementById('statDrawn').innerText = drawn.toLocaleString();
+      document.getElementById('statTotal').innerText = (remaining + drawn).toLocaleString();
+      document.getElementById('btnParticipantCount').innerText = remaining.toLocaleString();
+
+      let activePrizeName = "";
+      if (customPrizesList.length > 0 && currentPrizeIndex < customPrizesList.length) {
+        activePrizeName = customPrizesList[currentPrizeIndex];
+        const remainingPrizes = customPrizesList.length - currentPrizeIndex;
+        document.getElementById('statRemainingPrizes').innerText = remainingPrizes;
+        document.getElementById('prizesBadgeCount').innerText = remainingPrizes;
+      } else {
+        activePrizeName = `รางวัลที่ ${autoPrizeFallbackIndex}`;
+        document.getElementById('statRemainingPrizes').innerText = "อัตโนมัติ";
+        document.getElementById('prizesBadgeCount').innerText = "Auto";
+      }
+      document.getElementById('currentPrizeText').innerText = activePrizeName;
+
+      renderHistoryTable();
+    }
+
+    // จัดการ Animation จอเวทีเมื่อมีเครื่องใดเครื่องหนึ่งสั่งสุ่ม
+    function handleDrawingStateSync(data) {
+      const stageCard = document.getElementById('mainStageCard');
+      const stageDisplay = document.getElementById('stageDisplayName');
+      const subtext = document.getElementById('stageSubtext');
+      const btnText = document.getElementById('btnStartDrawText');
+
+      if (data.isDrawing) {
+        isDrawing = true;
+        stageCard.classList.add('rolling');
+        stageDisplay.classList.remove('winner-revealed', 'text-winner-gold');
+        stageDisplay.classList.add('text-sky-300');
+        subtext.innerText = "กำลังสุ่มหาผู้โชคดี...";
+        btnText.innerText = "กดเพื่อหยุดทันที";
+
+        if (!localRollInterval) {
+          localRollInterval = setInterval(() => {
+            if (availableParticipants.length > 0) {
+              const r = Math.floor(Math.random() * availableParticipants.length);
+              stageDisplay.innerText = availableParticipants[r];
+              playShuffleTick();
+            }
+          }, 50);
+        }
+      } else {
+        isDrawing = false;
+        if (localRollInterval) {
+          clearInterval(localRollInterval);
+          localRollInterval = null;
+        }
+        stageCard.classList.remove('rolling');
+
+        if (data.lastWinner) {
+          stageDisplay.innerText = data.lastWinner;
+          stageDisplay.className = "text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight font-sport text-winner-gold drop-shadow-[0_0_35px_rgba(253,224,71,0.5)] px-2 winner-revealed";
+          subtext.innerText = `🎉 ขอแสดงความยินดีกับผู้ได้รับ ${data.lastAwardedPrize} 🎉`;
+          btnText.innerText = "เริ่มสุ่มรางวัลต่อไป";
+
+          // ยิงพลุและเปิดเสียงเฉพาะตอนมี Event จบใหม่ๆ
+          if (data.triggerEventTime && (Date.now() - data.triggerEventTime < 3500)) {
+            playFanfareChords();
+            triggerGrandConfetti();
+          }
+        } else {
+          stageDisplay.innerText = "กดปุ่มเพื่อเริ่มสุ่ม";
+          stageDisplay.className = "text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight font-sport text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] px-2";
+          subtext.innerText = "READY FOR DRAW";
+          btnText.innerText = "เริ่มสุ่มรางวัล";
+        }
+      }
+    }
+
+    function setDuration(sec, btnElement) {
+      if (isDrawing) return;
+      selectedDurationSec = sec;
+      document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.className = "duration-btn px-3 py-1.5 text-xs sm:text-sm rounded-xl font-medium transition-all text-slate-600 hover:text-blue-600";
+      });
+      btnElement.className = "duration-btn px-3.5 py-1.5 text-xs sm:text-sm rounded-xl font-bold transition-all bg-blue-600 text-white shadow-md shadow-blue-500/25";
+      db.ref('marathon_draw/selectedDurationSec').set(sec);
+    }
+
+    function handleDrawClick() {
+      if (isDrawing) {
+        stopDrawImmediately();
+      } else {
+        startDraw();
+      }
+    }
+
+    function startDraw() {
+      if (availableParticipants.length === 0) {
+        showCustomAlert("ไม่มีรายชื่อเหลืออยู่ในโถสุ่มแล้ว! กรุณาเพิ่มรายชื่อหรือรีเซ็ตระบบ");
+        return;
+      }
+
+      initAudio();
+      // ส่งสัญญาณไปยัง Firebase ว่าเริ่มสุ่ม ทุกเครื่องจะหมุนพร้อมกัน
+      db.ref('marathon_draw/isDrawing').set(true);
+
+      if (selectedDurationSec === 0) {
+        finalizeWinner();
+        return;
+      }
+
+      if (shuffleAnimationTimer) clearTimeout(shuffleAnimationTimer);
+      shuffleAnimationTimer = setTimeout(() => {
+        finalizeWinner();
+      }, selectedDurationSec * 1000);
+    }
+
+    function stopDrawImmediately() {
+      if (shuffleAnimationTimer) clearTimeout(shuffleAnimationTimer);
+      finalizeWinner();
+    }
+
+    function finalizeWinner() {
+      if (shuffleAnimationTimer) clearTimeout(shuffleAnimationTimer);
+
+      if (availableParticipants.length === 0) {
+        db.ref('marathon_draw/isDrawing').set(false);
+        return;
+      }
+
+      const winnerIndex = Math.floor(Math.random() * availableParticipants.length);
+      const winnerName = availableParticipants[winnerIndex];
+
+      // ตัดชื่อออกเพื่อไม่ให้ซ้ำ
+      availableParticipants.splice(winnerIndex, 1);
+
+      let awardedPrize = "";
+      if (customPrizesList.length > 0 && currentPrizeIndex < customPrizesList.length) {
+        awardedPrize = customPrizesList[currentPrizeIndex];
+        currentPrizeIndex++;
+      } else {
+        awardedPrize = `รางวัลที่ ${autoPrizeFallbackIndex}`;
+        autoPrizeFallbackIndex++;
+      }
+
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const record = {
+        order: winnersHistory.length + 1,
+        prize: awardedPrize,
+        winner: winnerName,
+        time: timeString
+      };
+      winnersHistory.unshift(record);
+
+      // ส่งผลลัพธ์ขึ้น Firebase เพื่อให้ทุกหน้าจอแสดงชื่อผู้ชนะและยิงพลุพร้อมกัน
+      db.ref('marathon_draw').update({
+        isDrawing: false,
+        availableParticipants: availableParticipants,
+        currentPrizeIndex: currentPrizeIndex,
+        autoPrizeFallbackIndex: autoPrizeFallbackIndex,
+        winnersHistory: winnersHistory,
+        lastWinner: winnerName,
+        lastAwardedPrize: awardedPrize,
+        triggerEventTime: Date.now()
+      });
+    }
+
+    function triggerGrandConfetti() {
+      if (typeof confetti !== 'function') return;
+
+      const count = 200;
+      const defaults = { origin: { y: 0.7 }, zIndex: 9999 };
+
+      function fire(particleRatio, opts) {
+        confetti(Object.assign({}, defaults, opts, {
+          particleCount: Math.floor(count * particleRatio)
+        }));
+      }
+
+      fire(0.25, { spread: 26, startVelocity: 55, colors: ['#1a56db', '#38bdf8', '#ffffff'] });
+      fire(0.2, { spread: 60, colors: ['#f43f5e', '#fb7185', '#fda4af'] });
+      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, colors: ['#fbbf24', '#f59e0b'] });
+      fire(0.1, { spread: 120, startVelocity: 45 });
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      if (winnersHistory.length === 0) {
+        tbody.innerHTML = `
+          <tr id="emptyHistoryRow">
+            <td colspan="4" class="text-center py-8 text-slate-400 text-sm">
+              ยังไม่มีผู้ได้รับรางวัลในรอบนี้ เริ่มสุ่มผู้โชคดีคนแรกกันเลย!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = winnersHistory.map((item, idx) => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-blue-700">#${winnersHistory.length - idx}</td>
+          <td class="py-3 px-4 font-bold text-amber-700">${escapeHtml(item.prize)}</td>
+          <td class="py-3 px-4 text-base font-semibold text-slate-900">${escapeHtml(item.winner)}</td>
+          <td class="py-3 px-4 text-right font-mono text-xs text-slate-500">${item.time} น.</td>
+        </tr>
+      `).join('');
+    }
+
+    function exportHistoryCSV() {
+      if (winnersHistory.length === 0) {
+        showCustomAlert("ยังไม่มีข้อมูลผู้ได้รับรางวัลให้ส่งออก");
+        return;
+      }
+
+      let csvContent = "\uFEFFลำดับ,ชื่อของรางวัล,ชื่อ-นามสกุลผู้โชคดี,เวลาที่สุ่มได้\n";
+      const chronological = [...winnersHistory].reverse();
+      chronological.forEach((item, index) => {
+        csvContent += `"${index + 1}","${item.prize.replace(/"/g, '""')}","${item.winner.replace(/"/g, '""')}","${item.time}"\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `ผู้โชคดี_101_Yommarat_Minimarathon_2027_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function confirmResetSystem() {
+      const confirmed = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตระบบทั้งหมด? รายชื่อจะถูกตั้งค่ากลับสู่เริ่มต้น และล้างประวัติผู้ได้รับรางวัลทั้งหมดในทุกอุปกรณ์");
+      if (confirmed) {
+        initDefaultFirebase();
+      }
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function savePrizesList() {
+      const rawText = document.getElementById('prizesTextarea').value;
+      const list = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      customPrizesList = list;
+      currentPrizeIndex = 0;
+      closeModal('prizesModal');
+      
+      db.ref('marathon_draw').update({
+        customPrizesList: customPrizesList,
+        currentPrizeIndex: 0
+      });
+    }
+
+    function saveParticipantsList() {
+      const rawText = document.getElementById('participantsTextarea').value;
+      const list = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (list.length === 0) {
+        showCustomAlert("กรุณาระบุรายชื่อนักวิ่งอย่างน้อย 1 ชื่อ");
+        return;
+      }
+      availableParticipants = list;
+      closeModal('participantsModal');
+
+      db.ref('marathon_draw/availableParticipants').set(availableParticipants);
+    }
+
+    function restoreDefaultRunners() {
+      document.getElementById('participantsTextarea').value = DEFAULT_PARTICIPANTS.join('\n');
+      document.getElementById('modalParticipantCount').innerText = DEFAULT_PARTICIPANTS.length;
+    }
+
+    document.getElementById('participantsTextarea').addEventListener('input', function(e) {
+      const count = e.target.value.split('\n').map(l => l.trim()).filter(l => l.length > 0).length;
+      document.getElementById('modalParticipantCount').innerText = count;
+    });
+
+    function setupKeyListeners() {
+      window.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          handleDrawClick();
+        }
+      });
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function escapeHtml(string) {
+      const div = document.createElement('div');
+      div.innerText = string;
+      return div.innerHTML;
+    }
+
+    function showCustomAlert(message) {
+      const existing = document.getElementById('tempAlertBox');
+      if (existing) existing.remove();
+
+      const box = document.createElement('div');
+      box.id = 'tempAlertBox';
+      box.className = "fixed bottom-6 right-6 z-50 bg-white border border-rose-300 text-rose-700 px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce";
+      box.innerHTML = `<span>⚠️ ${escapeHtml(message)}</span>`;
+      document.body.appendChild(box);
+
+      setTimeout(() => {
+        if (box) box.remove();
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
